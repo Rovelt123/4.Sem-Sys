@@ -1,0 +1,41 @@
+name: Discord Push Notifications
+
+on:
+  push:
+    branches-ignore:
+      - Main
+
+jobs:
+  notify:
+    name: Notify Discord about branch push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Notify Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_GITHUB_PUSH_WEBHOOK_URL }}
+          USER_NAME: ${{ github.actor }}
+          BRANCH_NAME: ${{ github.ref_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "Missing DISCORD_GITHUB_PUSH_WEBHOOK_URL secret; skipping Discord notification."
+            exit 0
+          fi
+
+          if [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            AMOUNT_LINES=$(git show --numstat --format="" "$AFTER_SHA" | awk '{ added += $1; deleted += $2 } END { print added + deleted + 0 }')
+          else
+            AMOUNT_LINES=$(git diff --numstat "$BEFORE_SHA" "$AFTER_SHA" | awk '{ added += $1; deleted += $2 } END { print added + deleted + 0 }')
+          fi
+
+          PUSHED_AT=$(TZ=Europe/Copenhagen date +"%d-%m-%Y %H:%M")
+          export MESSAGE="${USER_NAME} pushed ${AMOUNT_LINES} to ${BRANCH_NAME} at ${PUSHED_AT}"
+
+          python3 -c "import json, os, urllib.request; req = urllib.request.Request(os.environ['DISCORD_WEBHOOK_URL'], data=json.dumps({'content': os.environ['MESSAGE']}).encode(), headers={'Content-Type': 'application/json'}, method='POST'); urllib.request.urlopen(req).read()"
