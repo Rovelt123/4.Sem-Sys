@@ -55,10 +55,10 @@ jobs:
           ssh -i ~/.ssh/deploy_key "${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}" '
             set -e
             mkdir -p ~/4.Sem
-            if [ ! -d ~/4.Sem/4.Sem-Sys/.git ]; then
-              GIT_SSH_COMMAND="ssh -i ~/.ssh/4_sem_sys_github_deploy -o StrictHostKeyChecking=accept-new" git clone git@github.com:Rovelt123/4.Sem-Sys.git ~/4.Sem/4.Sem-Sys
+            if [ ! -d ~/4.Sem/4.Sem-Sys-repo/.git ]; then
+              GIT_SSH_COMMAND="ssh -i ~/.ssh/4_sem_sys_github_deploy -o StrictHostKeyChecking=accept-new" git clone git@github.com:Rovelt123/4.Sem-Sys.git ~/4.Sem/4.Sem-Sys-repo
             fi
-            cd ~/4.Sem/4.Sem-Sys
+            cd ~/4.Sem/4.Sem-Sys-repo
             GIT_SSH_COMMAND="ssh -i ~/.ssh/4_sem_sys_github_deploy -o StrictHostKeyChecking=accept-new" git checkout Main
             GIT_SSH_COMMAND="ssh -i ~/.ssh/4_sem_sys_github_deploy -o StrictHostKeyChecking=accept-new" git pull --ff-only origin Main
             cd backend
