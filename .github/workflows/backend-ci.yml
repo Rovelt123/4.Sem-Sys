@@ -66,3 +66,21 @@ jobs:
             sleep 5
             docker compose exec -T sys2-api wget -qO- http://127.0.0.1:7070/api/health
           '
+
+      - name: Notify Discord about test result
+        if: always()
+        continue-on-error: true
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_GITHUB_TEST_WEBHOOK_URL }}
+          TEST_STATUS: ${{ job.status == 'success' && 'Success' || 'failed' }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "Missing DISCORD_GITHUB_TEST_WEBHOOK_URL secret; skipping Discord notification."
+            exit 0
+          fi
+
+          TESTED_AT=$(TZ=Europe/Copenhagen date +"%d-%m-%Y %H:%M")
+          export MESSAGE="Test have ${TEST_STATUS} on merge with branch ${BRANCH_NAME} at ${TESTED_AT}"
+
+          python3 -c "import json, os, urllib.request; req = urllib.request.Request(os.environ['DISCORD_WEBHOOK_URL'], data=json.dumps({'content': os.environ['MESSAGE']}).encode(), headers={'Content-Type': 'application/json'}, method='POST'); urllib.request.urlopen(req).read()"
