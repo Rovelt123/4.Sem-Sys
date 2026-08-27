@@ -72,18 +72,43 @@ jobs:
         continue-on-error: true
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_GITHUB_TEST_WEBHOOK_URL }}
-          TEST_STATUS: ${{ job.status == 'success' && 'Success' || 'failed' }}
+          RAW_STATUS: ${{ job.status }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+          WORKFLOW_NAME: Backend
         run: |
           if [ -z "$DISCORD_WEBHOOK_URL" ]; then
             echo "Missing DISCORD_GITHUB_TEST_WEBHOOK_URL secret; skipping Discord notification."
             exit 0
           fi
 
-          TESTED_AT=$(TZ=Europe/Copenhagen date +"%d-%m-%Y %H:%M")
-          export MESSAGE="Test have ${TEST_STATUS} on merge with branch ${BRANCH_NAME} at ${TESTED_AT}"
+          if [ "$RAW_STATUS" = "success" ]; then
+            export STATUS_TEXT="lykkedes"
+            export STATUS_TITLE="Tests lykkedes"
+            export STATUS_COLOR="3066993"
+          else
+            export STATUS_TEXT="fejlede"
+            export STATUS_TITLE="Tests fejlede"
+            export STATUS_COLOR="15158332"
+          fi
 
-          python3 -c "import json, os; print(json.dumps({'content': os.environ['MESSAGE']}))" \
+          export TESTED_AT=$(TZ=Europe/Copenhagen date +"%d-%m-%Y %H:%M")
+          export RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+          python3 -c "import json, os; print(json.dumps({
+            'username': 'GitHub Tests',
+            'embeds': [{
+              'title': f\"{os.environ['WORKFLOW_NAME']} - {os.environ['STATUS_TITLE']}\",
+              'description': f\"Testene **{os.environ['STATUS_TEXT']}** ved merge/push med branch `{os.environ['BRANCH_NAME']}`.\",
+              'color': int(os.environ['STATUS_COLOR']),
+              'fields': [
+                {'name': 'Workflow', 'value': os.environ['WORKFLOW_NAME'], 'inline': True},
+                {'name': 'Branch', 'value': os.environ['BRANCH_NAME'], 'inline': True},
+                {'name': 'Tidspunkt', 'value': os.environ['TESTED_AT'], 'inline': True},
+                {'name': 'GitHub Actions', 'value': f\"[Åbn run]({os.environ['RUN_URL']})\", 'inline': False}
+              ],
+              'footer': {'text': '4.Sem-Sys'}
+            }]
+          }))" \
             | curl --fail --silent --show-error \
                 --header "Content-Type: application/json" \
                 --data @- \
