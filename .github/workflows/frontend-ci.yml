@@ -82,4 +82,8 @@ jobs:
           TESTED_AT=$(TZ=Europe/Copenhagen date +"%d-%m-%Y %H:%M")
           export MESSAGE="Test have ${TEST_STATUS} on merge with branch ${BRANCH_NAME} at ${TESTED_AT}"
 
-          python3 -c "import json, os, urllib.request; req = urllib.request.Request(os.environ['DISCORD_WEBHOOK_URL'], data=json.dumps({'content': os.environ['MESSAGE']}).encode(), headers={'Content-Type': 'application/json'}, method='POST'); urllib.request.urlopen(req).read()"
+          python3 -c "import json, os; print(json.dumps({'content': os.environ['MESSAGE']}))" \
+            | curl --fail --silent --show-error \
+                --header "Content-Type: application/json" \
+                --data @- \
+                "$DISCORD_WEBHOOK_URL"
