@@ -55,12 +55,14 @@ jobs:
           ssh -i ~/.ssh/deploy_key "${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}" '
             set -e
             mkdir -p ~/4.Sem
-            if [ ! -d ~/4.Sem/4.Sem-Sys-repo/.git ]; then
-              GIT_SSH_COMMAND="ssh -i ~/.ssh/4_sem_sys_github_deploy -o StrictHostKeyChecking=accept-new" git clone git@github.com:Rovelt123/4.Sem-Sys.git ~/4.Sem/4.Sem-Sys-repo
+            if [ ! -d ~/4.Sem/backend-repo/.git ]; then
+              GIT_SSH_COMMAND="ssh -i ~/.ssh/4_sem_sys_github_deploy -o StrictHostKeyChecking=accept-new" git clone git@github.com:Rovelt123/4.Sem-Sys.git ~/4.Sem/backend-repo
             fi
-            cd ~/4.Sem/4.Sem-Sys-repo
+            cd ~/4.Sem/backend-repo
             GIT_SSH_COMMAND="ssh -i ~/.ssh/4_sem_sys_github_deploy -o StrictHostKeyChecking=accept-new" git checkout Main
             GIT_SSH_COMMAND="ssh -i ~/.ssh/4_sem_sys_github_deploy -o StrictHostKeyChecking=accept-new" git pull --ff-only origin Main
             cd backend
             mvn package
+            mkdir -p ~/4.Sem/backend-app
+            cp target/*.jar ~/4.Sem/backend-app/
           '
