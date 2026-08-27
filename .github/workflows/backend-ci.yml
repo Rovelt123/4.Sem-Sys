@@ -64,5 +64,14 @@ jobs:
             cd backend
             mvn package
             mkdir -p ~/4.Sem/backend-app
-            cp target/*.jar ~/4.Sem/backend-app/
+            cp target/backend.jar ~/4.Sem/backend-app/backend.jar
+            cd ~/4.Sem/backend-app
+            if [ -f backend.pid ] && kill -0 "$(cat backend.pid)" 2>/dev/null; then
+              kill "$(cat backend.pid)"
+              sleep 3
+            fi
+            PORT=7070 nohup java -jar backend.jar > backend.log 2>&1 &
+            echo $! > backend.pid
+            sleep 5
+            curl --fail http://127.0.0.1:7070/api/health
           '
