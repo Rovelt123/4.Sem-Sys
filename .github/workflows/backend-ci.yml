@@ -1,11 +1,19 @@
-name: Backend CI
+name: Backend CI/CD
 
 on:
   push:
+    branches:
+      - Main
+      - Development
+      - Review
     paths:
       - "backend/**"
       - ".github/workflows/backend-ci.yml"
   pull_request:
+    branches:
+      - Main
+      - Development
+      - Review
     paths:
       - "backend/**"
       - ".github/workflows/backend-ci.yml"
@@ -31,6 +39,28 @@ jobs:
           cache: maven
 
       - name: Build backend
-        run: mvn test
+        run: mvn package
 
-      # Add deployment steps here later, for example SSH pull/restart on your server.
+      - name: Prepare SSH
+        if: github.ref == 'refs/heads/Main'
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.SERVER_IP }}" >> ~/.ssh/known_hosts
+
+      - name: Pull and build backend on server
+        if: github.ref == 'refs/heads/Main'
+        run: |
+          ssh -i ~/.ssh/deploy_key "${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}" '
+            set -e
+            mkdir -p ~/4.Sem
+            if [ ! -d ~/4.Sem/4.Sem-Sys/.git ]; then
+              GIT_SSH_COMMAND="ssh -i ~/.ssh/4_sem_sys_github_deploy -o StrictHostKeyChecking=accept-new" git clone git@github.com:Rovelt123/4.Sem-Sys.git ~/4.Sem/4.Sem-Sys
+            fi
+            cd ~/4.Sem/4.Sem-Sys
+            GIT_SSH_COMMAND="ssh -i ~/.ssh/4_sem_sys_github_deploy -o StrictHostKeyChecking=accept-new" git checkout Main
+            GIT_SSH_COMMAND="ssh -i ~/.ssh/4_sem_sys_github_deploy -o StrictHostKeyChecking=accept-new" git pull --ff-only origin Main
+            cd backend
+            mvn package
+          '
