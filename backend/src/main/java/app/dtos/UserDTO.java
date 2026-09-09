@@ -15,7 +15,7 @@ public class UserDTO {
 
     private UUID id;
     private String name;
-    private String username;
+    private String email;
     private String lastName;
     private Set<Role> roles;
 
