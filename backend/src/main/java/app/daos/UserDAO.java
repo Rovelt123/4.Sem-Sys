@@ -24,6 +24,19 @@ public class UserDAO extends EntityManagerDAO<User> {
 
     // ________________________________________________________
 
+    public User findByEmailConfirmationToken(String token) {
+
+
+            String jpql = "SELECT u FROM User u WHERE u.token = :token";
+
+
+        return executeQuery(() ->
+                em.createQuery(jpql, User.class)
+                        .setParameter("token", token)
+                        .getSingleResult()
+        );
+    }
+
 
 }
 
