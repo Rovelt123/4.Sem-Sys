@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import app.enums.Role;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -25,16 +26,22 @@ public class User {
     private String lastname;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String email;
 
     private String password;
 
     @Builder.Default
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "roles")
     private Set<Role> roles = new HashSet<>();
+
+    @Column(nullable = false)
+    private boolean emailConfirmed = false;
+
+    private String emailConfirmationToken;
+
+    private LocalDateTime emailConfirmationExpiresAt;
 
 }
 
