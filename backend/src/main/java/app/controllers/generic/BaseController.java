@@ -34,7 +34,7 @@ public abstract class BaseController<E, D> implements IController {
 
         if (getAllEntities().isEmpty()) {
             String message = messageService.buildMessage(Notifications.GET_ALL_EMPTY, entityClass.getSimpleName().toLowerCase(Locale.ROOT));
-            respond(ctx, message, null);
+            respond(ctx, 204, message, null);
             return;
         }
 
@@ -47,7 +47,7 @@ public abstract class BaseController<E, D> implements IController {
                 entityClass.getSimpleName().toLowerCase(Locale.ROOT)
         );
 
-        respond(ctx, message, Map.of("data", list));
+        respond(ctx, 200, message, Map.of("data", list));
     }
 
     // ________________________________________________________
@@ -66,20 +66,20 @@ public abstract class BaseController<E, D> implements IController {
             String.valueOf(id)
         );
 
-        respond(ctx, message, Map.of("data", dto));
+        respond(ctx, 200, message, Map.of("data", dto));
     }
 
 
     // ________________________________________________________
 
-    protected void respond(Context ctx, String message, Object data) {
+    protected void respond(Context ctx, int status, String message, Object data) {
         if (data != null) {
-            ctx.status(200).json(Map.of(
+            ctx.status(status).json(Map.of(
                     "message", message,
                     "data", data
             ));
         } else {
-            ctx.status(200).json(Map.of(
+            ctx.status(status).json(Map.of(
                     "message", message
             ));
         }
