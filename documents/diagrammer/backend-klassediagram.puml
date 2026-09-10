@@ -1,0 +1,273 @@
+@startuml
+
+!pragma layout smetana
+top to bottom direction
+
+class Main {
+  + static Setup setup
+  - static final int port
+
+  + static void main(String[] args)
+}
+
+class Setup {
+  + static EntityManager em
+  - Javalin app
+  - MessageService messageService
+
+  + Setup(EntityManager em, int port)
+  + static void configuration(JavalinConfig config)
+  + void initialize()
+  + void endSession()
+}
+
+class Routing {
+  + Routing()
+  + static EndpointGroup registerRoutes()
+}
+
+interface IController {
+  + void getAll(Context ctx)
+  + void getByID(Context ctx)
+}
+
+abstract class BaseController {
+  # Class<E> entityClass
+  # IMapper<E, D> mapper
+  # MessageService messageService
+
+  # BaseController(Class<E> entityClass, IMapper<E, D> mapper)
+  # abstract List<E> getAllEntities()
+  # abstract E getEntityById(UUID id)
+  + void getAll(Context ctx)
+  + void getByID(Context ctx)
+  # void respond(Context ctx, int status, String message, Object data)
+}
+
+class UserController {
+  - UserDAO userDAO
+  - UserMapper userMapper
+  - UserService userService
+  - TokenGenerator tokenGenerator
+  - EmailService emailService
+
+  + UserController()
+  + static EndpointGroup registerRoutes()
+  # List<User> getAllEntities()
+  # User getEntityById(UUID id)
+  - void registerUser(Context ctx)
+  - void confirmMail(Context ctx)
+  - void login(Context ctx)
+}
+
+interface IDAO {
+  + T create(T entity)
+  + T update(T entity)
+  + T getById(Object id)
+  + boolean existByColumn(Object value, String column)
+  + List<T> getAll()
+  + T delete(T entity)
+  + T deleteById(Object id)
+  + void deleteAll()
+}
+
+class EntityManagerDAO {
+  # EntityManager em
+  # Class<T> classSpecific
+
+  # EntityManagerDAO(EntityManager em, Class<T> entityClass)
+  + T create(T entity)
+  + T update(T entity)
+  + T delete(T entity)
+  + T deleteById(Object id)
+  + T getById(Object id)
+  + boolean existByColumn(Object value, String column)
+  + List<T> getAll()
+  + void deleteAll()
+  # R executeQuery(Supplier<R> query)
+  - T findById(Object id)
+}
+
+class UserDAO {
+  + UserDAO(EntityManager em)
+  + User getByEmail(String email)
+  + User findByEmailConfirmationToken(String token)
+}
+
+interface IMapper {
+  + E toEntity(D dto)
+  + D toDTO(E entity)
+}
+
+class UserMapper {
+  + UserMapper()
+  + User toEntity(UserDTO dto)
+  + UserDTO toDTO(User entity)
+}
+
+class UserService {
+  - UserDAO userDAO
+
+  + UserService()
+  + boolean confirmEmail(String token)
+}
+
+class MessageService {
+  + MessageService()
+  + String buildMessage(Notifications notification, String... args)
+}
+
+class EmailService {
+  - String frontendUrl
+
+  + EmailService()
+  + void sendConfirmationEmail(User user)
+  - void sendEmail(String recipient, String subject, String body)
+}
+
+class PasswordService {
+  + PasswordService()
+  + static boolean passwordEquals(String hash, String enteredHash)
+  + static String hashHelper(String hash)
+}
+
+class TokenGenerator {
+  - SecureRandom secureRandom
+
+  + TokenGenerator()
+  + String generateToken()
+}
+
+class User {
+  - UUID id
+  - String firstname
+  - String lastname
+  - String email
+  - String password
+  - Set<Role> roles
+  - boolean emailConfirmed
+  - String emailConfirmationToken
+  - LocalDateTime emailConfirmationExpiresAt
+
+  + User()
+  + User(UUID id, String firstname, String lastname,\nString email, String password, Set<Role> roles,\nboolean emailConfirmed, String emailConfirmationToken,\nLocalDateTime emailConfirmationExpiresAt)
+}
+
+class UserDTO {
+  - UUID id
+  - String name
+  - String email
+  - String lastName
+  - Set<Role> roles
+
+  + UserDTO()
+  + UserDTO(UUID id, String name, String email, String lastName, Set<Role> roles)
+}
+
+enum Role {
+  ANYONE
+  USER
+  ADMIN
+  OWNER
+}
+
+enum Notifications {
+  LOGGED_IN
+  WRONG_CREDENTIALS
+  USERNAME_EXISTS
+  REGISTER_SUCCESS
+  REGISTER_NO_EMAIL
+  REGISTER_NO_PASSWORD
+  REGISTER_NO_PASSWORD_REPEAT
+  REGISTER_PASSWORD_MISMATCH
+  REGISTER_NO_FIRSTNAME
+  REGISTER_NO_LASTNAME
+  TOKEN_MISSING
+  LINK_EXPIRED
+  EMAIL_CONFIRMED
+  GET_ALL_EMPTY
+  GET_BY_ID
+  GET_ALL
+  BODY_EMPTY
+
+  - String displayName
+  - Notifications(String displayName)
+  + String getDisplayName()
+}
+
+class Utils {
+  + Utils()
+  + static String getPropertyValue(String propName, String resourceName)
+}
+
+class ErrorHandler {
+  + ErrorHandler()
+  + static int tryParseInt(String value, String message)
+  + static String tryString(String value, String message)
+  + static T tryEntity(T entity, String message)
+  + static boolean tryParseBoolean(String value, String message)
+  + static T tryParseEnum(Class<T> enumClass, String value, String message)
+  + static List<T> tryList(List<T> list, String message)
+  + static double tryParseDouble(String value, String message)
+  + static LocalDate tryParseLocalDate(String value, String message)
+  + static LocalDateTime tryParseLocalDateTime(String value, String message)
+  + static LocalTime tryParseLocalTime(String value, String message)
+  + static T tryBody(Context ctx, Class<T> clazz, String message)
+  + static Map<String, String> tryBodyMap(Context ctx, String message)
+}
+
+class ApiException {
+  - int status
+  - static Logger logger
+
+  + ApiException(int code, String msg)
+  + int getStatus()
+}
+
+' Main flow
+Main -down-> Setup
+Setup -down-> Routing
+Routing -down-> UserController
+
+' Controller hierarchy
+IController <|.. BaseController
+BaseController <|-- UserController
+
+' DAO hierarchy
+IDAO <|.. EntityManagerDAO
+EntityManagerDAO <|-- UserDAO
+
+' Mapper hierarchy
+IMapper <|.. UserMapper
+
+' Core dependencies
+UserController -down-> UserDAO
+UserController -down-> UserMapper
+UserController -down-> UserService
+UserController -down-> EmailService
+UserController -down-> TokenGenerator
+UserController -down-> PasswordService
+UserController -down-> ErrorHandler
+UserController -down-> Notifications
+
+BaseController -down-> IMapper
+BaseController -down-> MessageService
+
+Setup -down-> MessageService
+
+UserDAO -down-> User
+UserMapper -down-> User
+UserMapper -down-> UserDTO
+UserService -down-> UserDAO
+EmailService -down-> User
+MessageService -down-> Notifications
+
+User -down-> Role
+UserDTO -down-> Role
+
+RuntimeException <|-- ApiException
+Utils -down-> ApiException
+ErrorHandler -down-> ApiException
+
+
+@enduml
