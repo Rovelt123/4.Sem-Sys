@@ -1,15 +1,20 @@
 package app.services;
 
 import app.entities.User;
+import app.services.mail.MailSender;
 import app.utils.Utils;
 
 public class EmailService {
 
     private final String frontendUrl = Utils.getPropertyValue("url", "config.properties");
+    private final MailSender mailSender;
 
     // ________________________________________________________
 
-    public EmailService(){};
+    public EmailService(MailSender mailSender) {
+
+        this.mailSender = mailSender;
+    }
 
     // ________________________________________________________
 
@@ -31,7 +36,7 @@ public class EmailService {
                 Linket udløber efter 24 timer.
                 """.formatted(confirmationUrl);
 
-        sendEmail(
+        mailSender.sendMail(
                 user.getEmail(),
                 subject,
                 body
@@ -40,11 +45,8 @@ public class EmailService {
 
     // ________________________________________________________
 
-    private void sendEmail(
-            String recipient,
-            String subject,
-            String body
-    ) {
-        //TODO: Sæt vores SMTP mail system op
+    public void sendForgotPasswordEmail(String email, String token) {
+
+        //TODO make a solution such that the email will carry the JWTToken.
     }
 }
