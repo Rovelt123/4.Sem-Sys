@@ -87,8 +87,8 @@ public class UserController extends BaseController<User, UserDTO> {
 
         Role role = Role.USER;
 
-        if (userDAO.existByColumn(email, "username") || !email.contains("@")) {
-            String message = messageService.buildMessage(Notifications.USERNAME_EXISTS, email);
+        if (userDAO.existByColumn(email, "email") || !email.contains("@")) {
+            String message = messageService.buildMessage(Notifications.EMAIL_EXISTS, email);
             ctx.status(400).json(message);
             return;
         }
@@ -105,7 +105,7 @@ public class UserController extends BaseController<User, UserDTO> {
                         .emailConfirmationToken(token)
                         .emailConfirmationExpiresAt(LocalDateTime.now())
                         .build()),
-                messageService.buildMessage(Notifications.USERNAME_EXISTS, email)
+                messageService.buildMessage(Notifications.EMAIL_EXISTS, email)
         );
 
         emailService.sendConfirmationEmail(user);
@@ -151,7 +151,7 @@ public class UserController extends BaseController<User, UserDTO> {
     private void login(Context ctx) {
         Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
         User user = ErrorHandler.tryEntity(
-                userDAO.getByUsername(body.get("username")),
+                userDAO.getByEmail(body.get("email")),
                 Notifications.WRONG_CREDENTIALS.getDisplayName()
         );
 
