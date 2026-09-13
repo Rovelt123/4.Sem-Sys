@@ -35,10 +35,25 @@ jobs:
             AMOUNT_LINES=$(git diff --numstat "$BEFORE_SHA" "$AFTER_SHA" | awk '{ added += $1; deleted += $2 } END { print added + deleted + 0 }')
           fi
 
-          PUSHED_AT=$(TZ=Europe/Copenhagen date +"%d-%m-%Y %H:%M")
-          export MESSAGE="${USER_NAME} pushed ${AMOUNT_LINES} to ${BRANCH_NAME} at ${PUSHED_AT}"
+          export AMOUNT_LINES
+          export PUSHED_AT=$(TZ=Europe/Copenhagen date +"%d-%m-%Y %H:%M")
+          export COMMIT_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${AFTER_SHA}"
 
-          python3 -c "import json, os; print(json.dumps({'content': os.environ['MESSAGE']}))" \
+          python3 -c "import json, os; print(json.dumps({
+            'username': 'GitHub',
+            'embeds': [{
+              'title': 'Nyt push',
+              'description': f\"**{os.environ['USER_NAME']}** lavede et push med **{os.environ['AMOUNT_LINES']} linjer** til `{os.environ['BRANCH_NAME']}`.\",
+              'color': 3447003,
+              'fields': [
+                {'name': 'Branch', 'value': os.environ['BRANCH_NAME'], 'inline': True},
+                {'name': 'Linjer ændret', 'value': os.environ['AMOUNT_LINES'], 'inline': True},
+                {'name': 'Tidspunkt', 'value': os.environ['PUSHED_AT'], 'inline': True},
+                {'name': 'Commit', 'value': f\"[Åbn commit]({os.environ['COMMIT_URL']})\", 'inline': False}
+              ],
+              'footer': {'text': '4.Sem-Sys'}
+            }]
+          }))" \
             | curl --fail --silent --show-error \
                 --header "Content-Type: application/json" \
                 --data @- \
