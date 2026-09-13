@@ -12,7 +12,7 @@ public enum Notifications {
 
 
     // REGISTER
-    USERNAME_EXISTS("Username: %s already exists! Choose another username"),
+    EMAIL_EXISTS("Email: %s already exists! Choose another email"),
     REGISTER_SUCCESS("Welcome to Wedding planner %s! We hope you will enjoy the site"),
     REGISTER_NO_EMAIL("You must enter a valid email"),
     REGISTER_NO_PASSWORD("You must enter a valid password"),
