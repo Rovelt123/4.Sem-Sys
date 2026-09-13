@@ -1,0 +1,241 @@
+.upperContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    max-width: 540px;
+    margin: 80px auto 0;
+}
+
+.sloganText {
+    margin: 0 0 20px;
+
+    color: #85454b;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.titleText {
+    margin: 0 0 20px;
+
+    color: #191c22;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.05;
+}
+
+.text {
+    margin: 0 0 28px;
+
+    color: #62646a;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.signupButton {
+    display: inline-block;
+
+    padding: 13px 24px;
+    margin-bottom: 24px;
+
+    background-color: #85454b;
+    color: white;
+
+    border-radius: 25px;
+
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.signupButton:hover {
+    background-color: #f1b0b7;
+}
+
+.smallText {
+    margin: 0;
+
+    color: #62646a;
+    font-size: 14px;
+}
+
+.textLink {
+    color: #62646a;
+    text-decoration: none;
+}
+
+.textLink:hover {
+    text-decoration: underline;
+}
+
+.midSectionContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    max-width: 100%;
+    margin: 80px auto 0;
+    padding-left: 40px;
+}
+
+.title2Text {
+    margin: 0 0 20px;
+
+    color: #191c22;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.05;
+}
+.title3Text {
+    margin: 0 0 20px;
+
+    color: #191c22;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.05;
+}
+
+.cardContainer {
+    display: flex;
+    gap: 20px;
+
+    width: 100%;
+
+    margin-top: 20px;
+    margin-bottom: 70px;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+
+    flex: 1;
+
+    min-height: 170px;
+    padding: 24px;
+    margin-left: 10px;
+    margin-right: 10px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #dedbd7;
+    border-radius: 18px;
+
+    box-sizing: border-box;
+}
+
+.footerContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    margin-top: 70px;
+    padding: 20px 40px;
+
+    box-sizing: border-box;
+}
+
+.footerText {
+    margin: 0;
+
+    color: #62646a;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* MOBILE */
+/* MOBILE */
+/* MOBILE */
+/* MOBILE */
+/* MOBILE */
+
+@media (max-width: 768px) {
+
+    .upperContainer {
+        max-width: 100%;
+        margin: 50px 0 0;
+        padding: 0 20px;
+
+        box-sizing: border-box;
+    }
+
+    .sloganText {
+        font-size: 11px;
+        letter-spacing: 1.2px;
+        margin-bottom: 16px;
+    }
+
+    .titleText {
+        font-size: 38px;
+        line-height: 1.1;
+        margin-bottom: 18px;
+    }
+
+    .text {
+        font-size: 15px;
+        line-height: 1.6;
+        margin-bottom: 24px;
+    }
+
+    .signupButton {
+        padding: 12px 20px;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .smallText {
+        font-size: 13px;
+    }
+
+    .midSectionContainer {
+        max-width: 100%;
+        margin: 60px 0 0;
+        padding: 0 20px;
+    }
+
+    .title2Text {
+        font-size: 30px;
+    }
+
+    .title3Text {
+        font-size: 20px;
+    }
+
+    .cardContainer {
+        flex-direction: column;
+        gap: 16px;
+
+        width: 100%;
+        margin-top: 20px;
+        margin-bottom: 50px;
+
+        padding: 0 20px;
+
+        box-sizing: border-box;
+    }
+
+    .card {
+        width: 100%;
+        min-height: auto;
+
+        margin-left: 0;
+        margin-right: 0;
+
+        padding: 22px;
+    }
+
+    .footerContainer {
+        margin-top: 50px;
+        padding: 20px;
+    }
+
+    .footerText {
+        font-size: 11px;
+    }
+}

@@ -1,0 +1,121 @@
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    padding: 20px 40px;
+    box-sizing: border-box;
+}
+
+.logoContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.logoLink {
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 700;
+}
+.logoText {
+    margin: 0;
+    color: #191c22;
+    font-size: 18px;
+    font-weight: 700;
+}
+.logoCursive {
+    color: #85454b;
+    font-family: cursive;
+    font-style: oblique;
+    font-weight: 500;
+}
+
+.loginRegisterContainer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.loginButton,
+.signupButton {
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+
+    padding: 10px 20px;
+    border-radius: 24px;
+
+    transition: 0.2s ease;
+}
+
+
+.loginButton {
+    color: #191c22;
+    background-color: transparent;
+    border: 1px solid #dedbd7;
+}
+
+.loginButton:hover {
+    background-color: #f2efec;
+}
+
+
+.signupButton {
+    color: white;
+    background-color: #85454b;
+    border: 1px solid #85454b;
+}
+
+.signupButton:hover {
+    background-color: #f1c3c9;
+}
+
+/* MOBILE */
+/* MOBILE */
+/* MOBILE */
+/* MOBILE */
+/* MOBILE */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 16px 20px;
+    }
+
+    .logoLink,
+    .logoText {
+        font-size: 16px;
+    }
+
+    .loginRegisterContainer {
+        gap: 8px;
+    }
+
+    .loginButton,
+    .signupButton {
+        font-size: 12px;
+        padding: 8px 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 14px 16px;
+    }
+
+    .logoLink,
+    .logoText {
+        font-size: 15px;
+    }
+
+    .loginRegisterContainer {
+        gap: 6px;
+    }
+
+    .loginButton,
+    .signupButton {
+        font-size: 11px;
+        padding: 7px 11px;
+    }
+}

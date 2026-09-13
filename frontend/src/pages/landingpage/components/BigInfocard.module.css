@@ -1,0 +1,51 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    max-width: 1120px;
+    min-height: 190px;
+
+    margin: 70px auto 0;
+    padding: 40px 20px;
+
+    background-color: #1f2228;
+    border-radius: 22px;
+
+    box-sizing: border-box;
+}
+
+.titleText {
+    margin: 0 0 20px;
+
+    color: white;
+
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+
+    text-align: center;
+}
+
+.createButton {
+    display: inline-block;
+
+    padding: 12px 24px;
+
+    background-color: white;
+    color: #191c22;
+
+    border-radius: 24px;
+
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+
+    transition: 0.2s ease;
+}
+
+.createButton:hover {
+    background-color: #f2efec;
+}
