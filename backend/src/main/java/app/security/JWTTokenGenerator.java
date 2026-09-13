@@ -24,9 +24,9 @@ public class JWTTokenGenerator {
     public static String createToken(UserDTO user, String issuer, String expireMillis, String secretKey) throws JOSEException {
 
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
-            .subject(user.getUsername())
+            .subject(user.getEmail())
             .issuer(issuer)
-            .claim("username", user.getUsername())
+            .claim("email", user.getEmail())
             .expirationTime(new Date((new Date()).getTime() + (long)Integer.parseInt(expireMillis)))
             .build();
 
@@ -58,7 +58,7 @@ public class JWTTokenGenerator {
 
     public static UserDTO getUserFromToken(String token) throws ParseException {
         SignedJWT signedJWT = SignedJWT.parse(token);
-        String username = signedJWT.getJWTClaimsSet().getStringClaim("username");
-        return mapper.toDTO(userDAO.getByUsername(username));
+        String email = signedJWT.getJWTClaimsSet().getStringClaim("email");
+        return mapper.toDTO(userDAO.getByEmail(email));
     }
 }

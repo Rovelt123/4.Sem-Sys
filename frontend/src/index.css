@@ -1,12 +1,12 @@
 :root {
   --accent: #c15b6a;
-  --bg: oklch(98% 0.006 75);
-  --surface: oklch(100% 0 0);
-  --ink: oklch(23% 0.015 264);
-  --ink-soft: oklch(46% 0.02 264);
-  --line: oklch(90% 0.006 75);
-  --accent-soft: color-mix(in oklch, var(--accent) 14%, white);
-  --accent-ink: color-mix(in oklch, var(--accent) 72%, black);
+  --bg: #fbf8f4;
+  --surface: #ffffff;
+  --ink: #191d24;
+  --ink-soft: #525864;
+  --line: #e0ddda;
+  --accent-soft: #f9e8e9;
+  --accent-ink: #7b3842;
 
   font-family: "Work Sans", -apple-system, "Segoe UI", sans-serif;
   line-height: 1.5;
