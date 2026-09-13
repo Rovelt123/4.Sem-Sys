@@ -8,7 +8,9 @@ import calenderLogo from "../../../assets/calenderLogo.png"
 function LandingpageSection(){
     return(
         <div className={styles.container}>
+
             <div className={styles.upperContainer}>
+
                 <p className={styles.sloganText}>WEDDING PLANNING, MADE MANAGEABLE</p>
 
                 <h1 className={styles.titleText}>Say I Do to a wedding you can actually plan</h1>
@@ -20,17 +22,24 @@ function LandingpageSection(){
                     and when it's due.
                 </p>
 
-                <NavLink to="/signup" className={styles.signupButton}>Sign up, it's free</NavLink>
+                <NavLink to="/register" className={styles.signupButton}>Sign up, it's free</NavLink>
 
                 <p className={styles.smallText}>Already have an account?
                     <NavLink to="/login" className={styles.textLink}> Log in </NavLink>
                 </p>
+                
             </div>
 
+
+
             <div className={styles.midSectionContainer}>
+
                 <p className={styles.sloganText}> HOW IT WORKS </p>
                 <h2  className={styles.title2Text}> One place, the whole picture</h2>
+
             </div>
+
+
 
             <div className={styles.cardContainer}>
                 
@@ -52,12 +61,17 @@ function LandingpageSection(){
 
             </div>
 
+
             <BigInfocard/>
 
+
             <div className={styles.footerContainer}>
+
                 <p className={styles.footerText}>Say I Do</p>
                 <p className={styles.footerText}>4. Semester - Datamatiker</p>
+
             </div>
+
         </div>
     );
 
