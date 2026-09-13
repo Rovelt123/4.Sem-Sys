@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './RegisterPage.css'
+import styles from './RegisterPage.module.css'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
 
@@ -80,21 +80,21 @@ function RegisterPage({ onRegisterSuccess }) {
   // ________________________________________________________
 
   return (
-    <div className="register-page">
-      <div className="register-decor" aria-hidden="true"></div>
+    <div className={styles.registerPage}>
+      <div className={styles.registerDecor} aria-hidden="true"></div>
 
-      <a className="register-wordmark" href="/">
+      <a className={styles.registerWordmark} href="/">
         <img src="/logo.svg" alt="" />
         <span>Say <em>I Do</em></span>
       </a>
 
-      <form className="register-card" onSubmit={handleSubmit}>
+      <form className={styles.registerCard} onSubmit={handleSubmit}>
         <h1>Create account</h1>
-        <p className="register-subtitle">Start planning your big day</p>
+        <p className={styles.registerSubtitle}>Start planning your big day</p>
 
-        {error && <p className="register-error">{error}</p>}
+        {error && <p className={styles.registerError}>{error}</p>}
 
-        <div className="register-row">
+        <div className={styles.registerRow}>
           <div>
             <label htmlFor="first_name">First name</label>
             <input
@@ -155,7 +155,7 @@ function RegisterPage({ onRegisterSuccess }) {
         </button>
       </form>
 
-      <p className="register-secondary">
+      <p className={styles.registerSecondary}>
         Already have an account? <a href="/login">Log in</a>
       </p>
     </div>
