@@ -1,0 +1,84 @@
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+
+.item,
+.itemDone {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.list li:last-child {
+  border-bottom: none;
+}
+
+.itemDone .title {
+  color: var(--ink-soft);
+  text-decoration: line-through;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.label input {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--accent-ink);
+  cursor: pointer;
+}
+
+.title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.category {
+  font-size: 0.8125rem;
+  color: var(--ink-soft);
+}
+
+.due {
+  min-width: 6.5rem;
+  font-size: 0.8125rem;
+  text-align: right;
+  color: var(--ink-soft);
+}
+
+.badge {
+  min-width: 4.5rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 999px;
+}
+
+.high {
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+}
+
+.medium {
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.low {
+  color: var(--ink-soft);
+  background: var(--bg);
+}
