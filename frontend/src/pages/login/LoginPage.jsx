@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './LoginPage.css'
+import styles from './LoginPage.module.css'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
 
@@ -59,19 +59,19 @@ function LoginPage({ onLoginSuccess }) {
   // ________________________________________________________
 
   return (
-    <div className="login-page">
-      <div className="login-decor" aria-hidden="true"></div>
+    <div className={styles.loginPage}>
+      <div className={styles.loginDecor} aria-hidden="true"></div>
 
-      <a className="login-wordmark" href="/">
+      <a className={styles.loginWordmark} href="/">
         <img src="/logo.svg" alt="" />
         <span>Say <em>I Do</em></span>
       </a>
 
-      <form className="login-card" onSubmit={handleSubmit}>
+      <form className={styles.loginCard} onSubmit={handleSubmit}>
         <h1>Log in</h1>
-        <p className="login-subtitle">Welcome back</p>
+        <p className={styles.loginSubtitle}>Welcome back</p>
 
-        {error && <p className="login-error">{error}</p>}
+        {error && <p className={styles.loginError}>{error}</p>}
 
         <label htmlFor="email">Email</label>
         <input
@@ -96,7 +96,7 @@ function LoginPage({ onLoginSuccess }) {
         </button>
       </form>
 
-      <p className="login-secondary">
+      <p className={styles.loginSecondary}>
         No account yet? <a href="/register">Register</a>
       </p>
     </div>
