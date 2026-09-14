@@ -10,9 +10,6 @@ on:
   pull_request:
     branches:
       - Main
-    paths:
-      - "frontend/**"
-      - ".github/workflows/frontend-ci.yml"
 
 jobs:
   build:
