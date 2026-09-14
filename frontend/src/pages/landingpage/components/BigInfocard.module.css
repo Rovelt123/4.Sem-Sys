@@ -1,0 +1,51 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    max-width: 70rem;
+    min-height: 11.875rem;
+
+    margin: 4.375rem auto 0;
+    padding: 2.5rem 1.25rem;
+
+    background-color: var(--ink);
+    border-radius: 1.375rem;
+
+    box-sizing: border-box;
+}
+
+.titleText {
+    margin: 0 0 1.25rem;
+
+    color: var(--surface);
+
+    font-size: 1.625rem;
+    font-weight: 700;
+    line-height: 1.2;
+
+    text-align: center;
+}
+
+.createButton {
+    display: inline-block;
+
+    padding: 0.75rem 1.5rem;
+
+    background-color: var(--surface);
+    color: var(--ink);
+
+    border-radius: 1.5rem;
+
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+
+    transition: 0.2s ease;
+}
+
+.createButton:hover {
+    background-color: var(--accent-soft);
+}
