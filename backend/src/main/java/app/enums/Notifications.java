@@ -9,10 +9,18 @@ public enum Notifications {
     // LOGIN
     LOGGED_IN("Welcome back %s!"),
     WRONG_CREDENTIALS("You entered the wrong credentials!"),
+    PASSWORD_CHANGED("Password was changed successfully"),
+    PASSWORD_RESET_REQUESTED("If the email exists, a password reset link has been sent"),
+    PASSWORD_RESET_SUCCESS("Password has been reset successfully"),
+    PASSWORD_CURRENT_MISSING("You must enter your current password"),
+    PASSWORD_CURRENT_WRONG("Current password is wrong"),
+    PASSWORD_NEW_MISSING("You must enter a new password"),
+    PASSWORD_REPEAT_MISSING("You must repeat your new password"),
+    PASSWORD_UNCHANGED("New password must be different from current password"),
 
 
     // REGISTER
-    USERNAME_EXISTS("Username: %s already exists! Choose another username"),
+    EMAIL_EXISTS("Email: %s already exists! Choose another email"),
     REGISTER_SUCCESS("Welcome to Wedding planner %s! We hope you will enjoy the site"),
     REGISTER_NO_EMAIL("You must enter a valid email"),
     REGISTER_NO_PASSWORD("You must enter a valid password"),

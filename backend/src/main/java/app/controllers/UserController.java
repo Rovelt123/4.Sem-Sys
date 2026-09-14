@@ -49,6 +49,9 @@ public class UserController extends BaseController<User, UserDTO> {
             post("users/auth/register", controller::registerUser, Role.ANYONE);
             post("users/auth/login", controller::login, Role.ANYONE);
             get("users/auth/confirm-email", controller::confirmMail);
+            post("users/auth/forgot-password/request", controller::requestForgotPassword, Role.ANYONE);
+            post("users/auth/forgot-password", controller::forgotPassword, Role.ANYONE);
+            patch("users/me/password", controller::changePassword, Role.USER);
 
             get("/users", controller::getAll, Role.USER);
             get("/user/{id}", controller::getByID, Role.USER);
@@ -87,8 +90,8 @@ public class UserController extends BaseController<User, UserDTO> {
 
         Role role = Role.USER;
 
-        if (userDAO.existByColumn(email, "username") || !email.contains("@")) {
-            String message = messageService.buildMessage(Notifications.USERNAME_EXISTS, email);
+        if (userDAO.existByColumn(email, "email") || !email.contains("@")) {
+            String message = messageService.buildMessage(Notifications.EMAIL_EXISTS, email);
             ctx.status(400).json(message);
             return;
         }
@@ -105,7 +108,7 @@ public class UserController extends BaseController<User, UserDTO> {
                         .emailConfirmationToken(token)
                         .emailConfirmationExpiresAt(LocalDateTime.now())
                         .build()),
-                messageService.buildMessage(Notifications.USERNAME_EXISTS, email)
+                messageService.buildMessage(Notifications.EMAIL_EXISTS, email)
         );
 
         emailService.sendConfirmationEmail(user);
@@ -151,7 +154,7 @@ public class UserController extends BaseController<User, UserDTO> {
     private void login(Context ctx) {
         Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
         User user = ErrorHandler.tryEntity(
-                userDAO.getByUsername(body.get("username")),
+                userDAO.getByEmail(body.get("email")),
                 Notifications.WRONG_CREDENTIALS.getDisplayName()
         );
 
@@ -173,6 +176,46 @@ public class UserController extends BaseController<User, UserDTO> {
                 "token", token,
                 "data", dto
         ));
+    }
+
+    // ________________________________________________________
+
+    private void changePassword(Context ctx) {
+        UserDTO user = ctx.attribute("user");
+        Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
+
+        userService.changePassword(
+                user.getId(),
+                body.get("current_password"),
+                body.get("new_password"),
+                body.get("repeat_new_password")
+        );
+
+        respond(ctx, 200, Notifications.PASSWORD_CHANGED.getDisplayName(), null);
+    }
+
+    // ________________________________________________________
+
+    private void requestForgotPassword(Context ctx) {
+        Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
+
+        userService.requestForgotPassword(body.get("email"));
+
+        respond(ctx, 200, Notifications.PASSWORD_RESET_REQUESTED.getDisplayName(), null);
+    }
+
+    // ________________________________________________________
+
+    private void forgotPassword(Context ctx) {
+        Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
+
+        userService.forgotPassword(
+                body.get("token"),
+                body.get("new_password"),
+                body.get("repeat_new_password")
+        );
+
+        respond(ctx, 200, Notifications.PASSWORD_RESET_SUCCESS.getDisplayName(), null);
     }
 
 }

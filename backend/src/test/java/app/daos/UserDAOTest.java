@@ -48,39 +48,39 @@ class UserDAOTest extends EntityManagerDAOTest<User> {
 
     @Override
     protected String getExistingColumnName() {
-        return "username";
+        return "email";
     }
 
     @Override
     protected Object getExistingColumnValue(User entity) {
-        return entity.getUsername();
+        return entity.getEmail();
     }
 
     @Override
     protected Object getMissingColumnValue() {
-        return "missing-user";
+        return "missing@test.dk";
     }
 
     // ________________________________________________________
 
     @Test
-    void getByUsername() {
+    void getByEmail() {
         userDAO.create(testUser);
 
         em.flush();
         em.clear();
 
-        User found = userDAO.getByUsername("john123");
+        User found = userDAO.getByEmail("john123@test.dk");
 
         assertNotNull(found);
-        assertEquals("john123", found.getUsername());
+        assertEquals("john123@test.dk", found.getEmail());
         assertEquals(Set.of(Role.USER), found.getRoles());
     }
 
     // ________________________________________________________
 
     @Test
-    void getByUsernameNull() {
-        assertNull(userDAO.getByUsername("missing-user"));
+    void getByEmailNull() {
+        assertNull(userDAO.getByEmail("missing@test.dk"));
     }
 }
