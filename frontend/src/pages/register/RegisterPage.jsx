@@ -69,6 +69,7 @@ function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    console.log(API_BASE)
 
     const passwordError = validatePassword(form.password)
 

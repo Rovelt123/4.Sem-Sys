@@ -13,7 +13,7 @@ public class EmailService {
 
     public EmailService(MailSender mailSender) {
 
-        this(mailSender, Utils.getPropertyValue("URL", "config.properties"));
+        this(mailSender, Utils.getPropertyValue("FRONTEND", "config.properties"));
     }
 
     // ________________________________________________________
