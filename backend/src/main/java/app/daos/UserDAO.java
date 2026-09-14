@@ -34,6 +34,17 @@ public class UserDAO extends EntityManagerDAO<User> {
         );
     }
 
+    // ________________________________________________________
+
+    public User findByPasswordResetToken(String token) {
+        String jpql = "SELECT u FROM User u WHERE u.passwordResetToken = :token";
+
+        return executeQuery(() ->
+                em.createQuery(jpql, User.class)
+                        .setParameter("token", token)
+                        .getSingleResult()
+        );
+    }
 
 }
 

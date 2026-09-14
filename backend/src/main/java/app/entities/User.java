@@ -43,5 +43,9 @@ public class User {
 
     private LocalDateTime emailConfirmationExpiresAt;
 
+    private String passwordResetToken;
+
+    private LocalDateTime passwordResetExpiresAt;
+
 }
 
