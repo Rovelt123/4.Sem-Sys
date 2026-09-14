@@ -5,6 +5,8 @@ import styles from './RegisterPage.module.css'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
 
+console.log('VITE_API_URL:', import.meta.env.VITE_API_URL)
+
 // ________________________________________________________
 
 function parseErrorMessage(text) {
