@@ -1,0 +1,93 @@
+.card {
+  width: min(100% - 32px, 460px);
+  padding: 52px 44px 48px;
+
+  background: #ffffff;
+  border-radius: 24px;
+
+  box-shadow:
+    0 24px 70px rgba(40, 28, 24, 0.08),
+    0 2px 8px rgba(40, 28, 24, 0.04);
+
+  text-align: center;
+
+  position: relative;
+  z-index: 1;
+}
+
+.card h1 {
+  margin: 0 0 12px;
+
+  color: #25201e;
+
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.card p {
+  margin: 0;
+
+  color: #716966;
+
+  font-size: 0.98rem;
+  line-height: 1.65;
+}
+
+.description {
+  margin-top: 10px !important;
+
+  color: #9a918d !important;
+
+  font-size: 0.9rem !important;
+}
+
+.icon {
+  width: 72px;
+  height: 72px;
+
+  margin: 0 auto 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+}
+
+.icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.success {
+  color: #536f5a;
+  background: #edf4ee;
+}
+
+.error {
+  color: #a15d58;
+  background: #f8eeee;
+}
+
+.loading {
+  background: #f5f1ef;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+
+  border: 2px solid #ded6d2;
+  border-top-color: #72635d;
+
+  border-radius: 50%;
+
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
