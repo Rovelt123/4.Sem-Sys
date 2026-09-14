@@ -6,7 +6,7 @@ import app.utils.Utils;
 
 public class EmailService {
 
-    private final String frontendUrl = Utils.getPropertyValue("url", "config.properties");
+    private final String frontendUrl = Utils.getPropertyValue("URL", "config.properties");
     private final MailSender mailSender;
 
     // ________________________________________________________
@@ -47,6 +47,22 @@ public class EmailService {
 
     public void sendForgotPasswordEmail(String email, String token) {
 
-        //TODO make a solution such that the email will carry the JWTToken.
+        String resetUrl = frontendUrl + "/reset-password?token=" + token;
+
+        String subject = "Nulstil din adgangskode";
+
+        String body = """
+                Hej,
+                
+                Vi har modtaget en anmodning om at nulstille din adgangskode.
+                
+                Klik på linket for at vælge en ny adgangskode:
+                
+                %s
+                
+                Hvis du ikke har bedt om det, så kan du ignorere det mailen.
+                """.formatted(resetUrl);
+
+        mailSender.sendMail(email, subject, body);
     }
 }

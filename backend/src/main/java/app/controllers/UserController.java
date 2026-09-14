@@ -13,6 +13,8 @@ import app.services.EmailService;
 import app.services.PasswordService;
 import app.services.TokenGenerator;
 import app.services.UserService;
+import app.services.mail.BrevoMailSender;
+import app.services.mail.MailSender;
 import app.utils.ErrorHandler;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.Context;
@@ -32,7 +34,9 @@ public class UserController extends BaseController<User, UserDTO> {
     private final SecurityService securityService = new SecurityService();
     private final UserService userService = new UserService();
     private final TokenGenerator tokenGenerator = new TokenGenerator();
-    private final EmailService emailService = new EmailService();
+
+    private final MailSender mailSender = new BrevoMailSender();
+    private final EmailService emailService = new EmailService(mailSender);
 
     // ________________________________________________________
 
@@ -52,6 +56,7 @@ public class UserController extends BaseController<User, UserDTO> {
             post("users/auth/forgot-password/request", controller::requestForgotPassword, Role.ANYONE);
             post("users/auth/forgot-password", controller::forgotPassword, Role.ANYONE);
             patch("users/me/password", controller::changePassword, Role.USER);
+            //post("users/auth/resend-confirmation", controller::resendConfirmationEmail, Role.ANYONE);
 
             get("/users", controller::getAll, Role.USER);
             get("/user/{id}", controller::getByID, Role.USER);
@@ -217,5 +222,31 @@ public class UserController extends BaseController<User, UserDTO> {
 
         respond(ctx, 200, Notifications.PASSWORD_RESET_SUCCESS.getDisplayName(), null);
     }
+
+    /*
+
+    private void resendConfirmationEmail(Context ctx) {
+
+        Map<String, String> body = ErrorHandler.tryBodyMap(
+                ctx,
+                Notifications.BODY_EMPTY.getDisplayName()
+        );
+
+        String email = ErrorHandler.tryString(
+                body.get("email"),
+                Notifications.REGISTER_NO_EMAIL.getDisplayName()
+        );
+
+        userService.resendConfirmationEmail(email);
+
+        respond(
+                ctx,
+                200,
+                "Hvis emailadressen tilhører en ubekræftet konto, sender vi en bekræftelsesmail.",
+                null
+        );
+    }
+
+     */
 
 }
