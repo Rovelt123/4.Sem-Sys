@@ -5,14 +5,11 @@ function AuthStatusCard({ status, message }) {
     <div className={styles.card}>
       <div className={`${styles.icon} ${styles[status]}`}>
         {status === 'loading' && (
-          <span
-            className={styles.spinner}
-            aria-hidden="true"
-          />
+          <span className={styles.spinner}/>
         )}
 
         {status === 'success' && (
-          <svg viewBox="0 0 24 24" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
             <path
               d="M5 12.5 9.5 17 19 7.5"
               fill="none"
@@ -25,7 +22,7 @@ function AuthStatusCard({ status, message }) {
         )}
 
         {status === 'error' && (
-          <svg viewBox="0 0 24 24" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
             <path
               d="M12 8v5M12 16.5v.5"
               fill="none"
@@ -49,10 +46,7 @@ function AuthStatusCard({ status, message }) {
           <h1>Email confirmed</h1>
           <p>{message}</p>
 
-          <p className={styles.description}>
-            Your email address has been verified and your account is ready
-            to use.
-          </p>
+          <p className={styles.description}>Your email address has been verified and your account is ready to use.</p>
         </>
       )}
 
@@ -61,9 +55,7 @@ function AuthStatusCard({ status, message }) {
           <h1>Unable to confirm email</h1>
           <p>{message}</p>
 
-          <p className={styles.description}>
-            The confirmation link may have expired or already been used.
-          </p>
+          <p className={styles.description}>The confirmation link may have expired or already been used.</p>
         </>
       )}
     </div>
