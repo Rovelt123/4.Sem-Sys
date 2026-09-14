@@ -12,18 +12,39 @@ public class UserDAO extends EntityManagerDAO<User> {
 
     // ________________________________________________________
 
-    public User getByUsername(String username) {
-        String jpql = "SELECT u FROM User u WHERE u.username = :username";
+    public User getByEmail(String email) {
+        String jpql = "SELECT u FROM User u WHERE u.email = :email";
 
         return executeQuery(() ->
                 em.createQuery(jpql, User.class)
-                        .setParameter("username", username)
+                        .setParameter("email", email)
                         .getSingleResult()
         );
     }
 
     // ________________________________________________________
 
+    public User findByEmailConfirmationToken(String token) {
+        String jpql = "SELECT u FROM User u WHERE u.emailConfirmationToken = :token";
+
+        return executeQuery(() ->
+                em.createQuery(jpql, User.class)
+                        .setParameter("token", token)
+                        .getSingleResult()
+        );
+    }
+
+    // ________________________________________________________
+
+    public User findByPasswordResetToken(String token) {
+        String jpql = "SELECT u FROM User u WHERE u.passwordResetToken = :token";
+
+        return executeQuery(() ->
+                em.createQuery(jpql, User.class)
+                        .setParameter("token", token)
+                        .getSingleResult()
+        );
+    }
 
 }
 

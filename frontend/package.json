@@ -7,15 +7,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "latest",
-    "vite": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "eslint": "latest",
     "@eslint/js": "latest",
+    "@vitejs/plugin-react": "latest",
+    "eslint": "latest",
     "eslint-plugin-react-hooks": "latest",
     "eslint-plugin-react-refresh": "latest",
-    "globals": "latest"
-  },
-  "devDependencies": {}
+    "globals": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-router": "^8.3.1",
+    "vite": "latest"
+  }
 }

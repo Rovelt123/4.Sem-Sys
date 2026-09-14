@@ -52,7 +52,7 @@ public abstract class SetupTest {
                 .firstname("John")
                 .lastname("Doe")
                 .roles(Set.of(Role.USER))
-                .username("john123")
+                .email("john123@test.dk")
                 .password("123")
                 .build();
 
@@ -60,7 +60,7 @@ public abstract class SetupTest {
                 .firstname("Gert")
                 .lastname("Hansen")
                 .roles(Set.of(Role.USER))
-                .username("testuser2")
+                .email("testuser2@test.dk")
                 .password("123")
                 .build();
     }
