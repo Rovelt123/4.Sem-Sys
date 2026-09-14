@@ -3,9 +3,7 @@ import { Link, useNavigate } from 'react-router'
 import { saveSession } from '../../utils/storage'
 import styles from './RegisterPage.module.css'
 
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
-
-console.log('VITE_API_URL:', import.meta.env.VITE_API_URL)
+const API_BASE = 'https://sys2.roneu.dk/api' ?? 'http://localhost:9292/api'
 
 // ________________________________________________________
 
@@ -71,7 +69,6 @@ function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    console.log(API_BASE)
 
     const passwordError = validatePassword(form.password)
 
