@@ -21,6 +21,8 @@ public class SmtpMailSender implements MailSender {
     private final String username = System.getenv("SMTP_USERNAME");
     private final String password = System.getenv("SMTP_PASSWORD");
 
+    // ________________________________________________________
+
     @Override
     public void sendMail(String recipient, String subject, String body) {
 
