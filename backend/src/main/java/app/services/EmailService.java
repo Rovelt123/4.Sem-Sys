@@ -1,15 +1,28 @@
 package app.services;
 
 import app.entities.User;
+import app.services.mail.MailSender;
 import app.utils.Utils;
 
 public class EmailService {
 
-    private final String frontendUrl = Utils.getPropertyValue("URL", "config.properties");
+    private final String frontendUrl;
+    private final MailSender mailSender;
 
     // ________________________________________________________
 
-    public EmailService(){};
+    public EmailService(MailSender mailSender) {
+
+        this(mailSender, Utils.getPropertyValue("URL", "config.properties"));
+    }
+
+    // ________________________________________________________
+
+    public EmailService(MailSender mailSender, String frontendUrl) {
+
+        this.mailSender = mailSender;
+        this.frontendUrl = frontendUrl;
+    }
 
     // ________________________________________________________
 
@@ -31,7 +44,7 @@ public class EmailService {
                 Linket udløber efter 24 timer.
                 """.formatted(confirmationUrl);
 
-        sendEmail(
+        mailSender.sendMail(
                 user.getEmail(),
                 subject,
                 body
@@ -40,11 +53,24 @@ public class EmailService {
 
     // ________________________________________________________
 
-    private void sendEmail(
-            String recipient,
-            String subject,
-            String body
-    ) {
-        //TODO: Sæt vores SMTP mail system op
+    public void sendForgotPasswordEmail(String email, String token) {
+
+        String resetUrl = frontendUrl + "/reset-password?token=" + token;
+
+        String subject = "Nulstil din adgangskode";
+
+        String body = """
+                Hej,
+                
+                Vi har modtaget en anmodning om at nulstille din adgangskode.
+                
+                Klik på linket for at vælge en ny adgangskode:
+                
+                %s
+                
+                Hvis du ikke har bedt om det, så kan du ignorere det mailen.
+                """.formatted(resetUrl);
+
+        mailSender.sendMail(email, subject, body);
     }
 }
