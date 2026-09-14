@@ -44,17 +44,17 @@ function LandingpageSection(){
             <div className={styles.cardContainer}>
                 
                 <div className={styles.card}>
-                    <img src={piecesLogo} width={30} height={30}></img>
+                    <img src={piecesLogo} width={30} height={30} alt="" />
                     <h3 className={styles.title3Text}>Break it into pieces</h3>
                     <p className={styles.text}>Your wedding becomes categories, and each category concrete tasks, so nothing feels overwhelming</p>
                 </div>
                 <div className={styles.card}>
-                    <img src={calenderLogo} width={30} height={30}></img>
+                    <img src={calenderLogo} width={30} height={30} alt="" />
                     <h3 className={styles.title3Text}>Never miss a deadline</h3>
                     <p className={styles.text}>Every task gets a status and a due date, so you always know what's urgent</p>
                 </div>
                 <div className={styles.card}>
-                    <img src={familyLogo} width={30} height={30}></img>
+                    <img src={familyLogo} width={30} height={30} alt="" />
                     <h3 className={styles.title3Text}>Share the load</h3>
                     <p className={styles.text}>Give family and friends access to the tasks they've offered to help with</p>
                 </div>
