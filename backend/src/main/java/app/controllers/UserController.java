@@ -186,7 +186,11 @@ public class UserController extends BaseController<User, UserDTO> {
         UserDTO user = ctx.attribute("user");
         Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
 
-        String newPassword = body.get("new_password");
+        String newPassword = ErrorHandler.tryString(
+                body.get("new_password"),
+                Notifications.PASSWORD_NEW_MISSING.getDisplayName()
+        );
+
         PasswordService.passwordValidation(newPassword);
 
         userService.changePassword(
@@ -214,7 +218,11 @@ public class UserController extends BaseController<User, UserDTO> {
     private void forgotPassword(Context ctx) {
         Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
 
-        String newPassword = body.get("new_password");
+        String newPassword = ErrorHandler.tryString(
+                body.get("new_password"),
+                Notifications.PASSWORD_NEW_MISSING.getDisplayName()
+        );
+
         PasswordService.passwordValidation(newPassword);
 
         userService.forgotPassword(
