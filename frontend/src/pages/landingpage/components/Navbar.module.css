@@ -1,0 +1,118 @@
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    padding: 1.25rem 2.5rem;
+    box-sizing: border-box;
+}
+
+.logoContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.logoLink {
+    text-decoration: none;
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.logoText {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.logoCursive {
+    color: var(--accent-ink);
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-style: italic;
+    font-weight: 500;
+}
+
+.loginRegisterContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.loginButton,
+.signupButton {
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+
+    padding: 0.625rem 1.25rem;
+    border-radius: 1.5rem;
+
+    transition: 0.2s ease;
+}
+
+.loginButton {
+    color: var(--ink);
+    background-color: transparent;
+    border: 1px solid var(--line);
+}
+
+.loginButton:hover {
+    background-color: var(--accent-soft);
+}
+
+.signupButton {
+    color: var(--surface);
+    background-color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+.signupButton:hover {
+    background-color: var(--accent-ink);
+    border-color: var(--accent-ink);
+}
+
+/* MOBILE */
+
+@media (max-width: 48rem) {
+    .container {
+        padding: 1rem 1.25rem;
+    }
+
+    .logoLink,
+    .logoText {
+        font-size: 1rem;
+    }
+
+    .loginRegisterContainer {
+        gap: 0.5rem;
+    }
+
+    .loginButton,
+    .signupButton {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.875rem;
+    }
+}
+
+@media (max-width: 30rem) {
+    .container {
+        padding: 0.875rem 1rem;
+    }
+
+    .logoLink,
+    .logoText {
+        font-size: 0.9375rem;
+    }
+
+    .loginRegisterContainer {
+        gap: 0.375rem;
+    }
+
+    .loginButton,
+    .signupButton {
+        font-size: 0.6875rem;
+        padding: 0.4375rem 0.6875rem;
+    }
+}

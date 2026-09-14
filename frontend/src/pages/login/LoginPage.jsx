@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Link, useNavigate } from 'react-router'
+import { saveSession } from '../../utils/storage'
 import styles from './LoginPage.module.css'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
@@ -7,7 +9,13 @@ const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
 
 function parseErrorMessage(text) {
   try {
-    return JSON.parse(text).message || text
+    const parsed = JSON.parse(text)
+
+    if (typeof parsed === 'string') {
+      return parsed
+    }
+
+    return parsed.message || text
   } catch {
     return text
   }
@@ -15,11 +23,14 @@ function parseErrorMessage(text) {
 
 // ________________________________________________________
 
-function LoginPage({ onLoginSuccess }) {
+function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(true)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const navigate = useNavigate()
 
   // ________________________________________________________
 
@@ -43,12 +54,8 @@ function LoginPage({ onLoginSuccess }) {
 
       const result = await response.json()
 
-      localStorage.setItem('token', result.data.token)
-      localStorage.setItem('user', JSON.stringify(result.data.data))
-
-      if (onLoginSuccess) {
-        onLoginSuccess(result.data.data)
-      }
+      saveSession(result.data.token, result.data.data, remember)
+      navigate('/homepage')
     } catch {
       setError('Could not connect to the server')
     } finally {
@@ -62,10 +69,10 @@ function LoginPage({ onLoginSuccess }) {
     <div className={styles.loginPage}>
       <div className={styles.loginDecor} aria-hidden="true"></div>
 
-      <a className={styles.loginWordmark} href="/">
+      <Link className={styles.loginWordmark} to="/">
         <img src="/logo.svg" alt="" />
         <span>Say <em>I Do</em></span>
-      </a>
+      </Link>
 
       <form className={styles.loginCard} onSubmit={handleSubmit}>
         <h1>Log in</h1>
@@ -91,13 +98,22 @@ function LoginPage({ onLoginSuccess }) {
           required
         />
 
+        <label className={styles.loginRemember}>
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(e) => setRemember(e.target.checked)}
+          />
+          Remember me on this device
+        </label>
+
         <button type="submit" disabled={loading}>
           {loading ? 'Logging in...' : 'Log in'}
         </button>
       </form>
 
       <p className={styles.loginSecondary}>
-        No account yet? <a href="/register">Register</a>
+        No account yet? <Link to="/register">Register</Link>
       </p>
     </div>
   )
