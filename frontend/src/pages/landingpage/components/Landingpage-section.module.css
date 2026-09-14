@@ -52,6 +52,7 @@
 }
 
 .signupButton:hover {
+    color: var(--surface);
     background-color: var(--accent-ink);
 }
 

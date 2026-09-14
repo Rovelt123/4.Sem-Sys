@@ -5,6 +5,7 @@ import app.entities.User;
 import app.enums.Notifications;
 import app.exceptions.ApiException;
 import app.server.Setup;
+import app.services.mail.BrevoMailSender;
 import app.utils.ErrorHandler;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,8 @@ public class UserService {
     public UserService(UserDAO userDAO) {
         this(userDAO, new TokenGenerator());
     }
+
+    private final EmailService emailService = new EmailService(new BrevoMailSender());
 
     public UserService(UserDAO userDAO, TokenGenerator tokenGenerator) {
         this.userDAO = userDAO;
@@ -112,6 +115,8 @@ public class UserService {
         user.setPasswordResetToken(token);
         user.setPasswordResetExpiresAt(LocalDateTime.now().plusHours(1));
         userDAO.update(user);
+
+        emailService.sendForgotPasswordEmail(user.getEmail(), token);
     }
 
     // ________________________________________________________
@@ -152,5 +157,28 @@ public class UserService {
         user.setPasswordResetExpiresAt(null);
 
         userDAO.update(user);
+    }
+
+    // ________________________________________________________
+
+    public void resendConfirmationEmail(String email) {
+
+        String requestedEmail = ErrorHandler.tryString(
+                email,
+                Notifications.REGISTER_NO_EMAIL.getDisplayName()
+        );
+
+        User user = userDAO.getByEmail(requestedEmail);
+
+        if (user == null || user.isEmailConfirmed()) {
+            return;
+        }
+
+        user.setEmailConfirmationToken(tokenGenerator.generateToken());
+        user.setEmailConfirmationExpiresAt(LocalDateTime.now().plusHours(24));
+
+        userDAO.update(user);
+
+        emailService.sendConfirmationEmail(user);
     }
 }
