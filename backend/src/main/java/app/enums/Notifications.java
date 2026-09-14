@@ -18,6 +18,12 @@ public enum Notifications {
     PASSWORD_REPEAT_MISSING("You must repeat your new password"),
     PASSWORD_UNCHANGED("New password must be different from current password"),
 
+    // VALIDATE PASSWORD
+    PASSWORD_LENGTH_INVALID("The password must be between 8 and 30 characters"),
+    PASSWORD_LOWERCASE_MISSING("The password must contain a lowercase letter"),
+    PASSWORD_UPPERCASE_MISSING("The password must contain an uppercase letter"),
+    PASSWORD_SPECIAL_CHAR_MISSING("The password must contain a special character"),
+
 
     // REGISTER
     EMAIL_EXISTS("Email: %s already exists! Choose another email"),
