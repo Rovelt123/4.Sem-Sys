@@ -172,13 +172,8 @@ function ConfirmEmailPage() {
             )}
 
             {showResendForm && (
-              <form
-                className={styles.resendForm}
-                onSubmit={handleResendEmail}
-              >
-                <label htmlFor="resendEmail">
-                  Email address
-                </label>
+              <form className={styles.resendForm} onSubmit={handleResendEmail}>
+                <label htmlFor="resendEmail">Email address</label>
 
                 <input
                   id="resendEmail"
@@ -196,18 +191,14 @@ function ConfirmEmailPage() {
                 )}
 
                 {resendMessage && (
-                  <p className={styles.resendSuccess}>
-                    {resendMessage}
-                  </p>
+                  <p className={styles.resendSuccess}>{resendMessage}</p>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={resendLoading}
-                >
+                <button type="submit" disabled={resendLoading}>
                   {resendLoading
                     ? 'Sending...'
-                    : 'Send new confirmation email'}
+                    : 'Send new confirmation email'
+                  }
                 </button>
               </form>
             )}
