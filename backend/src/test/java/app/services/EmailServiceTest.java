@@ -1,47 +1,55 @@
 package app.services;
 
 import app.entities.User;
-import app.services.mail.BrevoMailSender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import java.util.ArrayList;
+import java.util.List;
 
-/*
-At the moment we can only test the API calls not the SMTP calls,
-therefore the tests only include for BrevoMailSender
-*/
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EmailServiceTest {
 
+    private final List<SentMail> sentMails = new ArrayList<>();
     private EmailService emailService;
 
     @BeforeEach
     void setUp() {
-
-        emailService = new EmailService(new BrevoMailSender());
+        emailService = new EmailService(
+                (recipient, subject, body) -> sentMails.add(new SentMail(recipient, subject, body)),
+                "https://frontend.example.test"
+        );
     }
 
     @Test
     void sendConfirmationEmail() {
-
         User user = new User();
-        user.setEmail("olivermjmj@outlook.dk");
+        user.setEmail("user@example.test");
         user.setEmailConfirmationToken("test-confirmation-token-123");
 
-        assertDoesNotThrow(() ->
-                emailService.sendConfirmationEmail(user)
-        );
+        emailService.sendConfirmationEmail(user);
+
+        assertEquals(1, sentMails.size());
+        SentMail mail = sentMails.getFirst();
+        assertEquals(user.getEmail(), mail.recipient());
+        assertEquals("Bekræft din email", mail.subject());
+        assertTrue(mail.body().contains(
+                "https://frontend.example.test/confirm-email?token=test-confirmation-token-123"));
     }
 
     @Test
     void sendForgotPasswordEmail() {
+        emailService.sendForgotPasswordEmail("user@example.test", "test-token-123");
 
-        String recipient = "olivermjmj@outlook.dk";
-        String token = "test-token-123";
-
-        assertDoesNotThrow(() ->
-                emailService.sendForgotPasswordEmail(recipient, token)
-        );
+        assertEquals(1, sentMails.size());
+        SentMail mail = sentMails.getFirst();
+        assertEquals("user@example.test", mail.recipient());
+        assertEquals("Nulstil din adgangskode", mail.subject());
+        assertTrue(mail.body().contains(
+                "https://frontend.example.test/reset-password?token=test-token-123"));
     }
+
+    private record SentMail(String recipient, String subject, String body) { }
 }

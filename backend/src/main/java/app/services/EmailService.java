@@ -6,14 +6,22 @@ import app.utils.Utils;
 
 public class EmailService {
 
-    private final String frontendUrl = Utils.getPropertyValue("URL", "config.properties");
+    private final String frontendUrl;
     private final MailSender mailSender;
 
     // ________________________________________________________
 
     public EmailService(MailSender mailSender) {
 
+        this(mailSender, Utils.getPropertyValue("URL", "config.properties"));
+    }
+
+    // ________________________________________________________
+
+    public EmailService(MailSender mailSender, String frontendUrl) {
+
         this.mailSender = mailSender;
+        this.frontendUrl = frontendUrl;
     }
 
     // ________________________________________________________
