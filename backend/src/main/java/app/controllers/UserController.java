@@ -83,6 +83,8 @@ public class UserController extends BaseController<User, UserDTO> {
         String password = ErrorHandler.tryString(body.get("password"), Notifications.REGISTER_NO_PASSWORD.getDisplayName());
         String password_repeat = ErrorHandler.tryString(body.get("repeat_password"), Notifications.REGISTER_NO_PASSWORD_REPEAT.getDisplayName());
 
+        PasswordService.passwordValidation(password);
+
         if(!password.equals(password_repeat)){
             ctx.status(400).json(Notifications.REGISTER_PASSWORD_MISMATCH.getDisplayName());
             return;
@@ -184,6 +186,13 @@ public class UserController extends BaseController<User, UserDTO> {
         UserDTO user = ctx.attribute("user");
         Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
 
+        String newPassword = ErrorHandler.tryString(
+                body.get("new_password"),
+                Notifications.PASSWORD_NEW_MISSING.getDisplayName()
+        );
+
+        PasswordService.passwordValidation(newPassword);
+
         userService.changePassword(
                 user.getId(),
                 body.get("current_password"),
@@ -208,6 +217,13 @@ public class UserController extends BaseController<User, UserDTO> {
 
     private void forgotPassword(Context ctx) {
         Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
+
+        String newPassword = ErrorHandler.tryString(
+                body.get("new_password"),
+                Notifications.PASSWORD_NEW_MISSING.getDisplayName()
+        );
+
+        PasswordService.passwordValidation(newPassword);
 
         userService.forgotPassword(
                 body.get("token"),

@@ -23,6 +23,28 @@ function parseErrorMessage(text) {
 
 // ________________________________________________________
 
+function validatePassword(password) {
+  if (password.length < 8 || password.length > 30) {
+    return 'The password must be between 8 and 30 characters'
+  }
+
+  if (password.search(/[a-z]/) < 0) {
+    return 'The password must contain a lowercase letter'
+  }
+
+  if (password.search(/[A-Z]/) < 0) {
+    return 'The password must contain an uppercase letter'
+  }
+
+  if (password.search(/[^A-Za-z0-9]/) < 0) {
+    return 'The password must contain a special character'
+  }
+
+  return ''
+}
+
+// ________________________________________________________
+
 function RegisterPage() {
   const [form, setForm] = useState({
     first_name: '',
@@ -47,6 +69,13 @@ function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+
+    const passwordError = validatePassword(form.password)
+
+    if (passwordError) {
+      setError(passwordError)
+      return
+    }
 
     if (form.password !== form.repeat_password) {
       setError('The passwords do not match')
@@ -132,12 +161,14 @@ function RegisterPage() {
           required
         />
 
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password">Password (8-30 characters, upper and lower case, one special character)</label>
         <input
           id="password"
           name="password"
           type="password"
           value={form.password}
+          minLength={8}
+          maxLength={30}
           onChange={handleChange}
           required
         />
@@ -148,6 +179,7 @@ function RegisterPage() {
           name="repeat_password"
           type="password"
           value={form.repeat_password}
+          maxLength={30}
           onChange={handleChange}
           required
         />
