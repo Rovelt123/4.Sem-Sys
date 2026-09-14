@@ -13,6 +13,7 @@ class Main {
 class Setup {
   + static EntityManager em
   - Javalin app
+  - AccessService accessService
   - MessageService messageService
 
   + Setup(EntityManager em, int port)
@@ -47,6 +48,7 @@ abstract class BaseController {
 class UserController {
   - UserDAO userDAO
   - UserMapper userMapper
+  - SecurityService securityService
   - UserService userService
   - TokenGenerator tokenGenerator
   - EmailService emailService
@@ -103,6 +105,36 @@ class UserMapper {
   + UserMapper()
   + User toEntity(UserDTO dto)
   + UserDTO toDTO(User entity)
+}
+
+class SecurityService {
+  - static SecurityService instance
+  - static Logger logger
+
+  + SecurityService()
+  + static SecurityService getInstance()
+  + Handler authenticate()
+  + boolean authorize(User user, Set<RouteRole> allowedRoles)
+  + String createToken(UserDTO user)
+  + UserDTO verifyToken(String token)
+}
+
+class AccessService {
+  - UserDAO userDAO
+  - SecurityService securityController
+
+  + AccessService()
+  + void accessHandler(Context ctx)
+}
+
+class JWTTokenGenerator {
+  - static UserDAO userDAO
+  - static UserMapper mapper
+
+  + static String createToken(UserDTO user, String issuer, String expireMillis, String secretKey)
+  + static boolean tokenIsValid(String token, String secretKey)
+  + static boolean tokenNotExpired(String token)
+  + static UserDTO getUserFromToken(String token)
 }
 
 class UserService {
@@ -174,7 +206,7 @@ enum Role {
 enum Notifications {
   LOGGED_IN
   WRONG_CREDENTIALS
-  USERNAME_EXISTS
+  EMAIL_EXISTS
   REGISTER_SUCCESS
   REGISTER_NO_EMAIL
   REGISTER_NO_PASSWORD
@@ -243,6 +275,7 @@ IMapper <|.. UserMapper
 ' Core dependencies
 UserController -down-> UserDAO
 UserController -down-> UserMapper
+UserController -down-> SecurityService
 UserController -down-> UserService
 UserController -down-> EmailService
 UserController -down-> TokenGenerator
@@ -254,6 +287,15 @@ BaseController -down-> IMapper
 BaseController -down-> MessageService
 
 Setup -down-> MessageService
+Setup -down-> AccessService
+
+' Security
+AccessService -down-> SecurityService
+AccessService -down-> UserDAO
+SecurityService -down-> JWTTokenGenerator
+SecurityService -down-> Utils
+JWTTokenGenerator -down-> UserDAO
+JWTTokenGenerator -down-> UserMapper
 
 UserDAO -down-> User
 UserMapper -down-> User
