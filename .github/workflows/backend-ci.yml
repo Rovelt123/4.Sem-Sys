@@ -10,9 +10,6 @@ on:
   pull_request:
     branches:
       - Main
-    paths:
-      - "backend/**"
-      - ".github/workflows/backend-ci.yml"
 
 jobs:
   test:
