@@ -13,7 +13,7 @@ class MessageServiceTest {
     void buildMessageShouldFormatNotificationWithArguments() {
         String message = messageService.buildMessage(Notifications.GET_BY_ID, "user", "123");
 
-        assertEquals("You fetched user with ID: 123", message);
+        assertEquals("You fetched user with ID: 12r3", message);
     }
 
     @Test
