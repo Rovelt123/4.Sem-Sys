@@ -180,3 +180,16 @@
   font-size: 0.875rem;
   color: var(--ink-soft);
 }
+
+.footer {
+    display: flex;
+    justify-content: center;
+
+    padding: 2rem 1.5rem 3rem;
+}
+
+.footerLink {
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+    text-decoration: underline;
+}

@@ -5,7 +5,7 @@ import app.utils.Utils;
 
 public class EmailService {
 
-    private final String frontendUrl = Utils.getPropertyValue("url", "config.properties");
+    private final String frontendUrl = Utils.getPropertyValue("URL", "config.properties");
 
     // ________________________________________________________
 
