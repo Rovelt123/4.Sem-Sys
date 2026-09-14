@@ -136,3 +136,22 @@
   color: var(--ink);
   border-bottom: 1px solid var(--line);
 }
+
+.loginRemember {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    margin: 0.25rem 0 0.5rem;
+
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--ink-soft);
+    cursor: pointer;
+}
+
+.loginRemember input {
+    width: auto;
+    margin: 0;
+    accent-color: var(--accent);
+}

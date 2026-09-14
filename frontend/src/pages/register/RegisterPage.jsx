@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Link, useNavigate } from 'react-router'
+import { saveSession } from '../../utils/storage'
 import styles from './RegisterPage.module.css'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
@@ -8,9 +10,11 @@ const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
 function parseErrorMessage(text) {
   try {
     const parsed = JSON.parse(text)
+
     if (typeof parsed === 'string') {
       return parsed
     }
+
     return parsed.message || text
   } catch {
     return text
@@ -41,7 +45,7 @@ function validatePassword(password) {
 
 // ________________________________________________________
 
-function RegisterPage({ onRegisterSuccess }) {
+function RegisterPage() {
   const [form, setForm] = useState({
     first_name: '',
     last_name: '',
@@ -51,6 +55,8 @@ function RegisterPage({ onRegisterSuccess }) {
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const navigate = useNavigate()
 
   // ________________________________________________________
 
@@ -93,12 +99,8 @@ function RegisterPage({ onRegisterSuccess }) {
 
       const result = await response.json()
 
-      localStorage.setItem('token', result.data.token)
-      localStorage.setItem('user', JSON.stringify(result.data.data))
-
-      if (onRegisterSuccess) {
-        onRegisterSuccess(result.data.data)
-      }
+      saveSession(result.data.token, result.data.data, true)
+      navigate('/homepage')
     } catch {
       setError('Could not connect to the server')
     } finally {
@@ -112,10 +114,10 @@ function RegisterPage({ onRegisterSuccess }) {
     <div className={styles.registerPage}>
       <div className={styles.registerDecor} aria-hidden="true"></div>
 
-      <a className={styles.registerWordmark} href="/">
+      <Link className={styles.registerWordmark} to="/">
         <img src="/logo.svg" alt="" />
         <span>Say <em>I Do</em></span>
-      </a>
+      </Link>
 
       <form className={styles.registerCard} onSubmit={handleSubmit}>
         <h1>Create account</h1>
@@ -188,7 +190,7 @@ function RegisterPage({ onRegisterSuccess }) {
       </form>
 
       <p className={styles.registerSecondary}>
-        Already have an account? <a href="/login">Log in</a>
+        Already have an account? <Link to="/login">Log in</Link>
       </p>
     </div>
   )
