@@ -68,6 +68,7 @@ function LandingpageSection(){
             <div className={styles.footerContainer}>
 
                 <p className={styles.footerText}>Say I Do</p>
+                <NavLink to="/privacy" className={styles.footerText}>Privacy policy</NavLink>
                 <p className={styles.footerText}>4. Semester - Datamatiker</p>
 
             </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { getConsent, setConsent } from '../utils/storage'
 import styles from './CookieConsent.module.css'
 
@@ -26,7 +27,7 @@ function CookieConsent() {
                     We store a login token so you do not have to sign in again, and we
                     remember this choice. Rejecting keeps you signed in for this browser
                     session only. Read more in our{' '}
-                    <a className={styles.link} href="/privacy">privacy policy</a>.
+                    <Link className={styles.link} to="/privacy">privacy policy</Link>.
                 </p>
             </div>
 

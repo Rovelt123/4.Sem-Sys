@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { Link, useNavigate } from 'react-router'
 import styles from './HomePage.module.css'
 import TaskList from './components/TaskList.jsx'
+import { getUser, clearSession } from '../../utils/storage'
 
 const PLACEHOLDER_WEDDING = {
   title: 'Our wedding',
@@ -20,12 +22,24 @@ const PLACEHOLDER_TASKS = [
 
 // ________________________________________________________
 
-function readUser() {
-  try {
-    return JSON.parse(localStorage.getItem('user'))
-  } catch {
-    return null
+function displayName(user) {
+  if (!user) {
+    return ''
   }
+
+  if (user.first_name) {
+    return user.first_name
+  }
+
+  if (user.name) {
+    return user.name
+  }
+
+  if (user.email) {
+    return user.email.split('@')[0]
+  }
+
+  return ''
 }
 
 // ________________________________________________________
@@ -38,9 +52,11 @@ function daysUntil(date) {
 // ________________________________________________________
 
 function HomePage() {
-  const user = readUser()
+  const user = getUser()
+  const name = displayName(user)
   const wedding = PLACEHOLDER_WEDDING
   const [tasks, setTasks] = useState(PLACEHOLDER_TASKS)
+  const navigate = useNavigate()
 
   const done = tasks.filter((task) => task.done).length
   const percent = Math.round((done / tasks.length) * 100)
@@ -57,9 +73,8 @@ function HomePage() {
   // ________________________________________________________
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    window.location.href = '/'
+    clearSession()
+    navigate('/login')
   }
 
   // ________________________________________________________
@@ -67,13 +82,13 @@ function HomePage() {
   return (
     <div className={styles.homePage}>
       <header className={styles.topBar}>
-        <a className={styles.wordmark} href="/">
+        <Link className={styles.wordmark} to="/">
           <img src="/logo.svg" alt="" />
           <span>Say <em>I Do</em></span>
-        </a>
+        </Link>
 
         <div className={styles.account}>
-          <span className={styles.accountName}>{user ? user.name : 'Guest'}</span>
+          <span className={styles.accountName}>{name || 'Guest'}</span>
           <button className={styles.logout} onClick={handleLogout}>Log out</button>
         </div>
       </header>
@@ -81,7 +96,7 @@ function HomePage() {
       <main className={styles.content}>
         <p className={styles.eyebrow}>Your planning</p>
         <h1 className={styles.heading}>
-          {user ? `Welcome back, ${user.name}` : 'Welcome back'}
+          {name ? `Welcome back, ${name}` : 'Welcome back'}
         </h1>
 
         <section className={styles.summary}>
@@ -124,6 +139,10 @@ function HomePage() {
 
         <TaskList tasks={tasks} onToggle={toggleTask} />
       </main>
+
+      <footer className={styles.footer}>
+        <Link className={styles.footerLink} to="/privacy">Privacy policy</Link>
+      </footer>
     </div>
   )
 }
