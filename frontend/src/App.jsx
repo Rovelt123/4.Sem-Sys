@@ -4,6 +4,7 @@ import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import HomePage from "./pages/homepage/HomePage";
 import PrivacyPolicyPage from "./pages/privacy/PrivacyPolicyPage";
+import NotFoundPage from "./pages/notfound/NotFoundPage";
 import { getToken } from "./utils/storage";
 import './App.css';
 
@@ -30,6 +31,7 @@ function App() {
           </RequireToken>
         }
       />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
 }
