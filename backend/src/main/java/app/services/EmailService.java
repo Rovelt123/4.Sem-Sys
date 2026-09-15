@@ -1,15 +1,28 @@
 package app.services;
 
 import app.entities.User;
+import app.services.mail.MailSender;
 import app.utils.Utils;
 
 public class EmailService {
 
-    private final String frontendUrl = Utils.getPropertyValue("URL", "config.properties");
+    private final String frontendUrl;
+    private final MailSender mailSender;
 
     // ________________________________________________________
 
-    public EmailService(){};
+    public EmailService(MailSender mailSender) {
+
+        this(mailSender, Utils.getPropertyValue("URL", "config.properties"));
+    }
+
+    // ________________________________________________________
+
+    public EmailService(MailSender mailSender, String frontendUrl) {
+
+        this.mailSender = mailSender;
+        this.frontendUrl = frontendUrl;
+    }
 
     // ________________________________________________________
 
@@ -17,21 +30,21 @@ public class EmailService {
 
         String confirmationUrl = frontendUrl+ "/confirm-email?token=" + user.getEmailConfirmationToken();
 
-        String subject = "Bekræft din email";
+        String subject = "Confirm your email";
 
         String body = """
-                Hej,
+                Hi,
 
-                Tak for din registrering.
+                Thank you for registering.
 
-                Bekræft din email ved at klikke på linket:
+                Confirm your email by clicking the link below:
 
                 %s
 
-                Linket udløber efter 24 timer.
+                The link expires after 24 hours.
                 """.formatted(confirmationUrl);
 
-        sendEmail(
+        mailSender.sendMail(
                 user.getEmail(),
                 subject,
                 body
@@ -40,11 +53,24 @@ public class EmailService {
 
     // ________________________________________________________
 
-    private void sendEmail(
-            String recipient,
-            String subject,
-            String body
-    ) {
-        //TODO: Sæt vores SMTP mail system op
+    public void sendForgotPasswordEmail(String email, String token) {
+
+        String resetUrl = frontendUrl + "/reset-password?token=" + token;
+
+        String subject = "Reset your password";
+
+        String body = """
+                Hi,
+
+                We received a request to reset your password.
+
+                Click the link below to choose a new one:
+
+                %s
+
+                If you did not ask for this, you can ignore this email.
+                """.formatted(resetUrl);
+
+        mailSender.sendMail(email, subject, body);
     }
 }
