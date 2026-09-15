@@ -34,7 +34,7 @@ class EmailServiceTest {
         assertEquals(1, sentMails.size());
         SentMail mail = sentMails.getFirst();
         assertEquals(user.getEmail(), mail.recipient());
-        assertEquals("Bekræft din email", mail.subject());
+        assertEquals("Confirm your email", mail.subject());
         assertTrue(mail.body().contains(
                 "https://frontend.example.test/confirm-email?token=test-confirmation-token-123"));
     }
@@ -46,7 +46,7 @@ class EmailServiceTest {
         assertEquals(1, sentMails.size());
         SentMail mail = sentMails.getFirst();
         assertEquals("user@example.test", mail.recipient());
-        assertEquals("Nulstil din adgangskode", mail.subject());
+        assertEquals("Reset your password", mail.subject());
         assertTrue(mail.body().contains(
                 "https://frontend.example.test/reset-password?token=test-token-123"));
     }
