@@ -18,7 +18,7 @@ function RequireToken({ children }) {
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Landingpage />} />
+      <Route path="/" element={getToken() ? <Navigate to="/homepage" replace /> : <Landingpage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/privacy" element={<PrivacyPolicyPage />} />
