@@ -30,18 +30,18 @@ public class EmailService {
 
         String confirmationUrl = frontendUrl+ "/confirm-email?token=" + user.getEmailConfirmationToken();
 
-        String subject = "Bekræft din email";
+        String subject = "Confirm your email";
 
         String body = """
-                Hej,
+                Hi,
 
-                Tak for din registrering.
+                Thank you for registering.
 
-                Bekræft din email ved at klikke på linket:
+                Confirm your email by clicking the link below:
 
                 %s
 
-                Linket udløber efter 24 timer.
+                The link expires after 24 hours.
                 """.formatted(confirmationUrl);
 
         mailSender.sendMail(
@@ -57,18 +57,18 @@ public class EmailService {
 
         String resetUrl = frontendUrl + "/reset-password?token=" + token;
 
-        String subject = "Nulstil din adgangskode";
+        String subject = "Reset your password";
 
         String body = """
-                Hej,
-                
-                Vi har modtaget en anmodning om at nulstille din adgangskode.
-                
-                Klik på linket for at vælge en ny adgangskode:
-                
+                Hi,
+
+                We received a request to reset your password.
+
+                Click the link below to choose a new one:
+
                 %s
-                
-                Hvis du ikke har bedt om det, så kan du ignorere det mailen.
+
+                If you did not ask for this, you can ignore this email.
                 """.formatted(resetUrl);
 
         mailSender.sendMail(email, subject, body);
