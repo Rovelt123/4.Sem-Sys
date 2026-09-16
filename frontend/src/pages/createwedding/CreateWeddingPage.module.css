@@ -1,0 +1,126 @@
+.createPage {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.75rem;
+  padding: 3rem 1.5rem;
+}
+
+.createDecor {
+  position: absolute;
+  top: -11.25rem;
+  right: -11.25rem;
+  width: 32.5rem;
+  height: 32.5rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--accent-soft), transparent 72%);
+  pointer-events: none;
+}
+
+.createWordmark {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-family: "Manrope", "Work Sans", sans-serif;
+  font-size: 1.625rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.createWordmark img {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.createWordmark em {
+  font-family: "Cormorant Garamond", "Manrope", serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.15em;
+  color: var(--accent-ink);
+}
+
+.createCard {
+  position: relative;
+  width: 100%;
+  max-width: 25rem;
+  padding: 2.25rem 2rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  box-shadow: 0 1.125rem 2.5rem rgba(25, 29, 36, 0.06);
+}
+
+.createCard h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.625rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.createCard label {
+  display: block;
+  margin: 1rem 0 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.createCard input,
+.createCard textarea {
+  width: 100%;
+  padding: 0.75rem 0.875rem;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+}
+
+.createCard textarea {
+  resize: vertical;
+}
+
+.createCard input:focus,
+.createCard textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.createCard button {
+  width: 100%;
+  margin-top: 1.5rem;
+  min-height: 2.75rem;
+  padding: 0.6875rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--surface);
+  background: var(--accent-ink);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.createCard button:hover {
+  filter: brightness(1.1);
+}
+
+.createCard button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.createError {
+  margin: 1rem 0 0;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: #b3261e;
+  background: #fdecec;
+  border-radius: 0.75rem;
+}
