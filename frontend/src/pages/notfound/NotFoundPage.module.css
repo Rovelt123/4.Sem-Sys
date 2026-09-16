@@ -1,0 +1,48 @@
+.page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 100vh;
+    padding: 3rem 1.5rem;
+    text-align: center;
+}
+
+.code {
+    margin: 0 0 0.5rem;
+    font-family: "Manrope", "Work Sans", sans-serif;
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--accent-ink);
+}
+
+.title {
+    margin: 0 0 0.75rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.body {
+    margin: 0 0 2rem;
+    max-width: 28rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+}
+
+.link {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--accent);
+    color: var(--surface);
+    border-radius: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.link:hover {
+    color: var(--surface);
+    background-color: var(--accent-ink);
+}

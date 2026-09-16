@@ -88,7 +88,7 @@ function HomePage() {
         </Link>
 
         <div className={styles.account}>
-          <span className={styles.accountName}>{name || 'Guest'}</span>
+          <span className={styles.accountName}>{name}</span>
           <button className={styles.logout} onClick={handleLogout}>Log out</button>
         </div>
       </header>
