@@ -54,6 +54,7 @@ function RegisterPage() {
     repeat_password: '',
   })
   const [error, setError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
   const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate()
@@ -69,16 +70,17 @@ function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setPasswordError('')
 
-    const passwordError = validatePassword(form.password)
+    const pwError = validatePassword(form.password)
 
-    if (passwordError) {
-      setError(passwordError)
+    if (pwError) {
+      setPasswordError(pwError)
       return
     }
 
     if (form.password !== form.repeat_password) {
-      setError('The passwords do not match')
+      setPasswordError('The passwords do not match')
       return
     }
 
@@ -160,6 +162,8 @@ function RegisterPage() {
           onChange={handleChange}
           required
         />
+
+        {passwordError && <p className={styles.registerError}>{passwordError}</p>}
 
         <label htmlFor="password">Password (8-30 characters, upper and lower case, one special character)</label>
         <input
