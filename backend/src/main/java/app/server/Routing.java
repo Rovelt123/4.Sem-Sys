@@ -1,6 +1,9 @@
 package app.server;
 
+import app.controllers.CategoryController;
+import app.controllers.TaskController;
 import app.controllers.UserController;
+import app.controllers.WeddingController;
 import io.javalin.apibuilder.EndpointGroup;
 
 import static io.javalin.apibuilder.ApiBuilder.get;
@@ -12,6 +15,9 @@ public class Routing {
         return () -> {
             path("/api", () -> {
                 UserController.registerRoutes().addEndpoints();
+                WeddingController.registerRoutes().addEndpoints();
+                CategoryController.registerRoutes().addEndpoints();
+                TaskController.registerRoutes().addEndpoints();
 
                 get("/health", ctx -> ctx.result("Health OK"));
             });
