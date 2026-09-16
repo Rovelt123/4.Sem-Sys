@@ -54,6 +54,22 @@ function daysUntil(date) {
 
 // ________________________________________________________
 
+function parseErrorMessage(text) {
+  try {
+    const parsed = JSON.parse(text)
+
+    if (typeof parsed === 'string') {
+      return parsed
+    }
+
+    return parsed.message || text
+  } catch {
+    return text
+  }
+}
+
+// ________________________________________________________
+
 function HomePage() {
   const user = getUser()
   const name = displayName(user)
@@ -65,6 +81,18 @@ function HomePage() {
 
   const [tasks, setTasks] = useState(PLACEHOLDER_TASKS)
   const navigate = useNavigate()
+
+  const [showEditWedding, setShowEditWedding] = useState(false)
+  //
+  const [editForm, setEditForm] = useState({
+    title: '',
+    date: '',
+    location: '',
+    budget: '',
+    description: '',
+  })
+  const [editError, setEditError] = useState('')
+  const [editingWedding, setEditingWedding] = useState(false)
   
 
   const done = tasks.filter((task) => task.done).length
@@ -94,19 +122,6 @@ function HomePage() {
         }
 
         const result = await response.json()
-
-        /*
-          Your backend currently returns:
-
-          {
-            message: "...",
-            data: {
-              data: [...]
-            }
-          }
-
-          So the wedding array is result.data.data
-        */
 
         const weddings = result.data.data
 
@@ -152,6 +167,7 @@ function HomePage() {
   }
 
   // ________________________________________________________
+
     const handleDeleteWedding = async () => {
       try {
         const response = await fetch(
@@ -175,6 +191,80 @@ function HomePage() {
         console.error('Could not delete wedding:', error)
       }
     }
+  // ________________________________________________________
+
+    const handleEditWedding = async (e) => {
+      e.preventDefault()
+
+      setEditError('')
+      setEditingWedding(true)
+
+      const body = {
+        title: editForm.title,
+        date: editForm.date,
+        location: editForm.location,
+        description: editForm.description,
+      }
+
+      if (editForm.budget !== '') {
+        body.budget = editForm.budget
+      }
+
+      try {
+        const response = await fetch(
+          `${API_BASE}/weddings/${wedding.id}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify(body),
+          }
+        )
+
+        if (!response.ok) {
+          const text = await response.text()
+          setEditError(
+            parseErrorMessage(text) || 'Could not update wedding'
+          )
+          return
+        }
+
+        setWedding({
+          ...wedding,
+          ...body,
+        })
+
+        setShowEditWedding(false)
+
+      } catch {
+        setEditError('Could not connect to the server')
+      } finally {
+        setEditingWedding(false)
+      }
+    }
+
+  // ________________________________________________________
+    const handleOpenEdit = () => {
+    setEditForm({
+      title: wedding.title ?? '',
+      date: wedding.date ?? '',
+      location: wedding.location ?? '',
+      budget: wedding.budget != null? String(wedding.budget): '',
+      description: wedding.description ?? '',
+    })
+
+    setEditError('')
+    setShowEditWedding(true)
+  }
+
+  // ________________________________________________________
+
+    const handleEditChange = (e) => {
+      setEditForm({...editForm, [e.target.name]: e.target.value,})
+    }
+
   // ________________________________________________________
 
   return (
@@ -213,6 +303,7 @@ function HomePage() {
         {!loadingWedding && wedding && (
           <>
             <section className={styles.summary}>
+              <button className={styles.editWedding} onClick={handleOpenEdit}> Edit </button>
 
               <div className={styles.summaryMain}>
                 <p className={styles.date}>
@@ -223,72 +314,43 @@ function HomePage() {
                   })}
                 </p>
 
-                <h2 className={styles.weddingTitle}>
-                  {wedding.title}
-                </h2>
+                <h2 className={styles.weddingTitle}> {wedding.title} </h2>
 
-                <p className={styles.venue}>
-                  {wedding.location}
-                </p>
+                <p className={styles.venue}> {wedding.location} </p>
               </div>
 
               <div className={styles.summaryStats}>
 
                 <div className={styles.stat}>
-                  <span className={styles.statValue}>
-                    {days}
-                  </span>
-                  <span className={styles.statLabel}>
-                    days to go
-                  </span>
+                  <span className={styles.statValue}> {days} </span>
+                  <span className={styles.statLabel}> days to go </span>
                 </div>
 
                 <div className={styles.stat}>
-                  <span className={styles.statValue}>
-                    {percent}%
-                  </span>
-                  <span className={styles.statLabel}>
-                    done
-                  </span>
+                  <span className={styles.statValue}> {percent}% </span>
+                  <span className={styles.statLabel}> done </span>
                 </div>
-
               </div>
 
               <div className={styles.progress}>
-                <div
-                  className={styles.bar}
-                  style={{ width: percent + '%' }}
-                />
+                <div className={styles.bar} style={{ width: percent + '%' }} />
               </div>
-
             </section>
 
             <div className={styles.sectionHead}>
-              <h2 className={styles.sectionTitle}>
-                Tasks
-              </h2>
+              <h2 className={styles.sectionTitle}> Tasks </h2>
 
-              <span className={styles.sectionCount}>
-                {done} of {tasks.length} done
-              </span>
+              <span className={styles.sectionCount}> {done} of {tasks.length} done </span>
             </div>
 
-            <TaskList
-              tasks={tasks}
-              onToggle={toggleTask}
-            />
+            <TaskList tasks={tasks} onToggle={toggleTask} />
           </>
         )}
 
       </main>
 
       <footer className={styles.footer}>
-        <Link
-          className={styles.footerLink}
-          to="/privacy"
-        >
-          Privacy policy
-        </Link>
+        <Link className={styles.footerLink} to="/privacy"> Privacy policy </Link>
       </footer>
 
       {showDeleteWarning && (
@@ -296,27 +358,66 @@ function HomePage() {
           <div className={styles.deleteModal}>
             <h2>Delete wedding?</h2>
 
-            <p>
-              Are you sure you want to delete this wedding?
-              
-            </p>
+            <p> Are you sure you want to delete this wedding?</p>
 
             <div className={styles.modalActions}>
-              <button className={styles.deleteWedding}
-                onClick={() => setShowDeleteWarning(false)}
-              >
-                Cancel
-              </button>
-
-              <button className={styles.deleteWedding}
-                onClick={handleDeleteWedding}
-              >
-                Delete
-              </button>
+              <button className={styles.deleteWedding} onClick={() => setShowDeleteWarning(false)}>Cancel</button>
+              <button className={styles.deleteWedding} onClick={handleDeleteWedding}>Delete</button>
             </div>
           </div>
         </div>
       )}
+
+        {showEditWedding && ( <div className={styles.modalOverlay}>
+
+            <form className={styles.editModal} onSubmit={handleEditWedding}>
+              <h2>Edit wedding</h2>
+
+              {editError && (<p className={styles.editError}> {editError} </p> )}
+
+              <label htmlFor="edit-title">
+                Title
+              </label>
+
+              <input id="edit-title" name="title" type="text" value={editForm.title} onChange={handleEditChange} required />
+
+              <label htmlFor="edit-date">
+                Date
+              </label>
+
+              <input id="edit-date" name="date" type="date" value={editForm.date} onChange={handleEditChange} required />
+
+              <label htmlFor="edit-location">
+                Location
+              </label>
+
+              <input id="edit-location" name="location" type="text" value={editForm.location} onChange={handleEditChange} />
+
+              <label htmlFor="edit-budget"> Budget </label>
+
+              <input id="edit-budget" name="budget" type="number" min="0" step="1" value={editForm.budget} onChange={handleEditChange} />
+
+              <label htmlFor="edit-description">
+                Description
+              </label>
+
+              <textarea id="edit-description" name="description" rows="4" value={editForm.description} onChange={handleEditChange} required />
+
+              <div className={styles.modalActions}>
+
+                <button className={styles.createWedding} type="button" onClick={() => setShowEditWedding(false)}>
+                  Cancel
+                </button>
+
+                <button className={styles.createWedding} type="submit" disabled={editingWedding}>
+                  {editingWedding ? 'Saving...' : 'Save changes'}
+                </button>
+
+              </div>
+            </form>
+
+          </div>
+        )}
 
     </div>
   )
