@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import styles from './HomePage.module.css'
 import TaskList from './components/TaskList.jsx'
-import { getUser, clearSession } from '../../utils/storage'
+import {getToken, getUser, clearSession } from '../../utils/storage'
+const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
 
 const PLACEHOLDER_WEDDING = {
   title: 'Our wedding',
@@ -56,14 +57,75 @@ function daysUntil(date) {
 function HomePage() {
   const user = getUser()
   const name = displayName(user)
-  const wedding = PLACEHOLDER_WEDDING
+
+  const [wedding, setWedding] = useState(null)
+  const [loadingWedding, setLoadingWedding] = useState(true)
+
   const [tasks, setTasks] = useState(PLACEHOLDER_TASKS)
   const navigate = useNavigate()
   
 
   const done = tasks.filter((task) => task.done).length
   const percent = Math.round((done / tasks.length) * 100)
-  const days = daysUntil(wedding.date)
+  const days = wedding ? daysUntil(wedding.date) : 0
+    // ________________________________________________________
+
+  useEffect(() => {
+
+    const loadWedding = async () => {
+
+      try {
+        const response = await fetch(`${API_BASE}/weddings`, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        })
+
+        
+        if (response.status === 204) {
+          setWedding(null)
+          return
+        }
+
+        if (!response.ok) {
+          throw new Error('Could not load wedding')
+        }
+
+        const result = await response.json()
+
+        /*
+          Your backend currently returns:
+
+          {
+            message: "...",
+            data: {
+              data: [...]
+            }
+          }
+
+          So the wedding array is result.data.data
+        */
+
+        const weddings = result.data.data
+
+        if (weddings.length > 0) {
+          setWedding(weddings[0])
+        } else {
+          setWedding(null)
+        }
+
+      } catch (error) {
+        console.error('Could not load wedding:', error)
+        setWedding(null)
+
+      } finally {
+        setLoadingWedding(false)
+      }
+    }
+
+    loadWedding()
+
+  }, [])
 
   // ________________________________________________________
 
@@ -98,7 +160,7 @@ function HomePage() {
 
         <div className={styles.account}>
           <span className={styles.accountName}>{name}</span>
-          {!wedding && (<button className={styles.createWedding} onClick={handleCreateWedding}>Create wedding</button>)}
+          {!loadingWedding && !wedding && (<button className={styles.createWedding} onClick={handleCreateWedding}>Create wedding</button>)}
           <button className={styles.logout} onClick={handleLogout}>Log out</button>
         </div>
       </header>
@@ -109,50 +171,98 @@ function HomePage() {
           {name ? `Welcome back, ${name}` : 'Welcome back'}
         </h1>
 
-        <section className={styles.summary}>
-          <div className={styles.summaryMain}>
-            <p className={styles.date}>
-              {new Date(wedding.date).toLocaleDateString('en-GB', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
-            </p>
-            <h2 className={styles.weddingTitle}>{wedding.title}</h2>
-            <p className={styles.venue}>{wedding.venue}</p>
-          </div>
+        {loadingWedding && (
+          <p>Loading wedding...</p>
+        )}
 
-          <div className={styles.summaryStats}>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{days}</span>
-              <span className={styles.statLabel}>days to go</span>
+        {!loadingWedding && !wedding && (
+          <section className={styles.summary}>
+            <h2>You haven't created a wedding yet</h2>
+            <p>Use the Create wedding button to get started.</p>
+          </section>
+        )}
+
+        {!loadingWedding && wedding && (
+          <>
+            <section className={styles.summary}>
+
+              <div className={styles.summaryMain}>
+                <p className={styles.date}>
+                  {new Date(wedding.date).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </p>
+
+                <h2 className={styles.weddingTitle}>
+                  {wedding.title}
+                </h2>
+
+                <p className={styles.venue}>
+                  {wedding.location}
+                </p>
+              </div>
+
+              <div className={styles.summaryStats}>
+
+                <div className={styles.stat}>
+                  <span className={styles.statValue}>
+                    {days}
+                  </span>
+                  <span className={styles.statLabel}>
+                    days to go
+                  </span>
+                </div>
+
+                <div className={styles.stat}>
+                  <span className={styles.statValue}>
+                    {percent}%
+                  </span>
+                  <span className={styles.statLabel}>
+                    done
+                  </span>
+                </div>
+
+              </div>
+
+              <div className={styles.progress}>
+                <div
+                  className={styles.bar}
+                  style={{ width: percent + '%' }}
+                />
+              </div>
+
+            </section>
+
+            <div className={styles.sectionHead}>
+              <h2 className={styles.sectionTitle}>
+                Tasks
+              </h2>
+
+              <span className={styles.sectionCount}>
+                {done} of {tasks.length} done
+              </span>
             </div>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{wedding.guests}</span>
-              <span className={styles.statLabel}>guests</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statValue}>{percent}%</span>
-              <span className={styles.statLabel}>done</span>
-            </div>
-          </div>
 
-          <div className={styles.progress}>
-            <div className={styles.bar} style={{ width: percent + '%' }}></div>
-          </div>
-        </section>
+            <TaskList
+              tasks={tasks}
+              onToggle={toggleTask}
+            />
+          </>
+        )}
 
-        <div className={styles.sectionHead}>
-          <h2 className={styles.sectionTitle}>Tasks</h2>
-          <span className={styles.sectionCount}>{done} of {tasks.length} done</span>
-        </div>
-
-        <TaskList tasks={tasks} onToggle={toggleTask} />
       </main>
 
       <footer className={styles.footer}>
-        <Link className={styles.footerLink} to="/privacy">Privacy policy</Link>
+        <Link
+          className={styles.footerLink}
+          to="/privacy"
+        >
+          Privacy policy
+        </Link>
       </footer>
+
     </div>
   )
 }
