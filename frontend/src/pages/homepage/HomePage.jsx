@@ -20,6 +20,8 @@ const PLACEHOLDER_TASKS = [
   { id: 6, title: 'Plan the seating', category: 'Guests', due: '2027-05-01', priority: 'Low', done: false },
 ]
 
+
+
 // ________________________________________________________
 
 function displayName(user) {
@@ -57,6 +59,7 @@ function HomePage() {
   const wedding = PLACEHOLDER_WEDDING
   const [tasks, setTasks] = useState(PLACEHOLDER_TASKS)
   const navigate = useNavigate()
+  
 
   const done = tasks.filter((task) => task.done).length
   const percent = Math.round((done / tasks.length) * 100)
@@ -79,6 +82,12 @@ function HomePage() {
 
   // ________________________________________________________
 
+  const handleCreateWedding = () => {
+    navigate('/create')
+  }
+
+  // ________________________________________________________
+
   return (
     <div className={styles.homePage}>
       <header className={styles.topBar}>
@@ -89,6 +98,7 @@ function HomePage() {
 
         <div className={styles.account}>
           <span className={styles.accountName}>{name}</span>
+          {!wedding && (<button className={styles.createWedding} onClick={handleCreateWedding}>Create wedding</button>)}
           <button className={styles.logout} onClick={handleLogout}>Log out</button>
         </div>
       </header>
