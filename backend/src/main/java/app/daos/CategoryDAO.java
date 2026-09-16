@@ -30,7 +30,7 @@ public class CategoryDAO extends EntityManagerDAO<Category> {
     // ________________________________________________________
 
     public Category getByIdAndOwnerId(UUID id, UUID ownerId) {
-        String jpql = "SELECT c FROM Category c WHERE c.id = :id wedding.owner.id = :ownerId";
+        String jpql = "SELECT c FROM Category c WHERE c.id = :id AND wedding.owner.id = :ownerId";
 
         return executeQuery(() ->
             em.createQuery(jpql, Category.class)

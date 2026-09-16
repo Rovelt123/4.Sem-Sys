@@ -61,6 +61,8 @@ function HomePage() {
   const [wedding, setWedding] = useState(null)
   const [loadingWedding, setLoadingWedding] = useState(true)
 
+  const [showDeleteWarning, setShowDeleteWarning] = useState(false)
+
   const [tasks, setTasks] = useState(PLACEHOLDER_TASKS)
   const navigate = useNavigate()
   
@@ -127,8 +129,9 @@ function HomePage() {
 
   }, [])
 
-  // ________________________________________________________
 
+
+  // ________________________________________________________
   const toggleTask = (id) => {
     setTasks(tasks.map((task) =>
       task.id === id ? { ...task, done: !task.done } : task
@@ -149,6 +152,30 @@ function HomePage() {
   }
 
   // ________________________________________________________
+    const handleDeleteWedding = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE}/weddings/${wedding.id}`,
+          {
+            method: 'DELETE',
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
+        )
+
+        if (!response.ok) {
+          throw new Error('Could not delete wedding')
+        }
+
+        setWedding(null)
+        setShowDeleteWarning(false)
+
+      } catch (error) {
+        console.error('Could not delete wedding:', error)
+      }
+    }
+  // ________________________________________________________
 
   return (
     <div className={styles.homePage}>
@@ -161,6 +188,7 @@ function HomePage() {
         <div className={styles.account}>
           <span className={styles.accountName}>{name}</span>
           {!loadingWedding && !wedding && (<button className={styles.createWedding} onClick={handleCreateWedding}>Create wedding</button>)}
+          {!loadingWedding && wedding && (<button className={styles.deleteWedding} onClick={() => setShowDeleteWarning(true)}>Delete wedding</button>)}
           <button className={styles.logout} onClick={handleLogout}>Log out</button>
         </div>
       </header>
@@ -262,6 +290,33 @@ function HomePage() {
           Privacy policy
         </Link>
       </footer>
+
+      {showDeleteWarning && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.deleteModal}>
+            <h2>Delete wedding?</h2>
+
+            <p>
+              Are you sure you want to delete this wedding?
+              
+            </p>
+
+            <div className={styles.modalActions}>
+              <button className={styles.deleteWedding}
+                onClick={() => setShowDeleteWarning(false)}
+              >
+                Cancel
+              </button>
+
+              <button className={styles.deleteWedding}
+                onClick={handleDeleteWedding}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   )
