@@ -236,3 +236,184 @@
         font-size: 0.6875rem;
     }
 }
+.hero {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 34rem;
+    padding: 5rem 1.5rem;
+
+    overflow: hidden;
+}
+
+.heroImage {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    filter: saturate(0.78) contrast(0.96) brightness(1.03);
+}
+
+.heroWash {
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+        to bottom,
+        rgba(243, 238, 229, 0.18),
+        rgba(58, 48, 36, 0.36) 62%,
+        rgba(40, 33, 24, 0.52)
+    );
+}
+
+.hero .upperContainer {
+    position: relative;
+
+    align-items: center;
+    text-align: center;
+
+    max-width: 38rem;
+    margin: 0 auto;
+}
+
+.monogram {
+    display: grid;
+    place-items: center;
+
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.1875rem;
+
+    border: 1px solid rgba(246, 242, 234, 0.8);
+    border-radius: 50%;
+
+    color: #f6f2ea;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 1.875rem;
+    line-height: 1;
+}
+
+.hero .sloganText {
+    color: rgba(246, 242, 234, 0.82);
+    letter-spacing: 0.1875rem;
+}
+
+.hero .titleText {
+    color: #f6f2ea;
+
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 3.5rem;
+    font-weight: 500;
+    line-height: 1.1;
+}
+
+.hero .text {
+    color: rgba(246, 242, 234, 0.86);
+}
+
+.hero .signupButton {
+    background-color: rgba(246, 242, 234, 0.95);
+    color: var(--ink);
+}
+
+.hero .signupButton:hover {
+    background-color: var(--surface);
+    color: var(--ink);
+}
+
+.hero .smallText,
+.hero .textLink {
+    color: rgba(246, 242, 234, 0.8);
+}
+
+@media (max-width: 40rem) {
+
+    .hero {
+        min-height: 28rem;
+        padding: 4rem 1.25rem;
+    }
+
+    .hero .titleText {
+        font-size: 2.25rem;
+    }
+}
+
+.midSectionContainer {
+    align-items: center;
+    text-align: center;
+
+    max-width: 44rem;
+    margin: 5.5rem auto 0;
+    padding-left: 0;
+}
+
+.midSectionContainer::after {
+    content: "";
+
+    width: 1px;
+    height: 2.75rem;
+    margin-top: 1.75rem;
+
+    background-color: var(--line);
+}
+
+.title2Text {
+    max-width: 16ch;
+    margin: 0 auto;
+
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 2.75rem;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: 0.375rem;
+    text-transform: uppercase;
+}
+
+.cardContainer {
+    gap: 2rem;
+
+    max-width: 58rem;
+    margin: 3.5rem auto 4.375rem;
+}
+
+.card {
+    min-height: 0;
+    margin: 0;
+    padding: 1.25rem 0 0;
+
+    background-color: transparent;
+
+    border: none;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+}
+
+.card img {
+    display: none;
+}
+
+.title3Text {
+    margin: 0 0 0.5rem;
+
+    font-family: "Manrope", "Work Sans", sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1875rem;
+    text-transform: uppercase;
+}
+
+.card .text {
+    margin: 0;
+
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-style: italic;
+    font-size: 1.25rem;
+    line-height: 1.35;
+}
