@@ -1,10 +1,13 @@
 package app;
 
 import app.configs.TestHibernateConfig;
+import app.daos.CategoryDAO;
 import app.daos.UserDAO;
 import app.daos.WeddingDAO;
+import app.entities.Category;
 import app.entities.User;
 import app.entities.Wedding;
+import app.enums.Categories;
 import app.enums.Role;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -24,11 +27,11 @@ public abstract class SetupTest {
     protected EntityManager em;
 
     protected UserDAO userDAO;
+    protected WeddingDAO weddingDAO;
+    protected CategoryDAO categoryDAO;
 
     protected User testUser;
     protected User testUser2;
-
-    protected WeddingDAO weddingDAO;
 
     protected Wedding wedding;
     protected Wedding wedding2;
@@ -38,7 +41,8 @@ public abstract class SetupTest {
 
     protected float weddingBudget = 100;
 
-
+    protected Category category;
+    protected Category category2;
 
     // ________________________________________________________
 
@@ -63,6 +67,7 @@ public abstract class SetupTest {
 
         userDAO = new UserDAO(em);
         weddingDAO = new WeddingDAO(em);
+        categoryDAO = new CategoryDAO(em);
 
         testUser = User.builder()
                 .firstname("John")
@@ -95,6 +100,18 @@ public abstract class SetupTest {
                 .budget(weddingBudget)
                 .build();
         wedding2.setOwner(testUser);
+
+      category = Category.builder()
+                .title(Categories.CATERING.getDisplayName())
+                .position(1)
+                .wedding(wedding)
+                .build();
+
+      category2 = Category.builder()
+              .title(Categories.CATERING.getDisplayName())
+              .position(2)
+              .wedding(wedding2)
+              .build();
     }
 
     // ________________________________________________________
