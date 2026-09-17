@@ -1,6 +1,7 @@
 package app;
 
 import app.configs.TestHibernateConfig;
+import app.daos.TaskDAO;
 import app.daos.UserDAO;
 import app.entities.User;
 import app.enums.Role;
@@ -21,6 +22,7 @@ public abstract class SetupTest {
     protected EntityManager em;
 
     protected UserDAO userDAO;
+    protected TaskDAO taskDAO;
 
     protected User testUser;
     protected User testUser2;
