@@ -2,9 +2,11 @@ package app.controllers;
 
 import app.controllers.generic.BaseController;
 import app.daos.CategoryDAO;
+import app.daos.WeddingDAO;
 import app.dtos.CategoryDTO;
+import app.dtos.TaskDTO;
 import app.entities.Category;
-import app.entities.User;
+import app.entities.Task;
 import app.enums.Notifications;
 import app.enums.Role;
 import app.mappers.CategoryMapper;
@@ -24,6 +26,7 @@ import static io.javalin.apibuilder.ApiBuilder.*;
 public class CategoryController extends BaseController<Category, CategoryDTO> {
 
     private final CategoryDAO categoryDAO = new CategoryDAO(Setup.em);
+    private final WeddingDAO weddingDAO = new WeddingDAO(Setup.em);
     private final CategoryMapper categoryMapper = new CategoryMapper();
     private final CategoryService categoryService = new CategoryService();
     private final UserService userService = new UserService();
@@ -42,9 +45,10 @@ public class CategoryController extends BaseController<Category, CategoryDTO> {
 
         return () -> {
             get("/weddings/{weddingId}/categories", controller::getAllCategories, Role.USER);
-            get("/categories/{id}", controller::getByID, Role.USER);
+            get("/categories/{id}", controller::getMyCategoryByID, Role.USER);
             post("/weddings/{weddingId}/categories", controller::createCategory, Role.USER);
             put("/categories/{id}", controller::updateCategory, Role.USER);
+            patch("/categories/{id}/position", controller::moveCategory, Role.USER);
             delete("/categories/{id}", controller::deleteCategory, Role.USER);
         };
     }
@@ -65,15 +69,26 @@ public class CategoryController extends BaseController<Category, CategoryDTO> {
 
     // ________________________________________________________
 
-    private void getAllCategories(Context ctx) {
+    //TODO: Skal have sat wedding ID på også - Denne henter jo kun task pr. id?
+    public void getMyCategoryByID(Context ctx) {
+        Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
+        UUID categoryId = ErrorHandler.tryParseUUID(body.get("category_id"), Notifications.CATEGORY_ID_INVALID.getDisplayName());
+
+        Category category = categoryDAO.getByIdAndOwnerId(userService.getOwnerId(ctx), categoryId);
+        CategoryDTO categoryDTO = categoryMapper.toDTO(category);
+        respond(ctx, 200, messageService.buildMessage(Notifications.GET_BY_ID, "category", body.get("category_id")), Map.of("data", categoryDTO));
+    }
+
+    // ________________________________________________________
+
+    //TODO: Skal have sat wedding ID på også - Denne henter jo kun task pr. id?
+    public void getAllCategories(Context ctx) {
 
         UUID weddingId = ErrorHandler.tryParseUUID(ctx.pathParam("weddingId"), Notifications.WEDDING_ID_INVALID.getDisplayName());
 
-        List<CategoryDTO> categories = categoryDAO
-            .getAllByWeddingIdAndOwnerId(weddingId, userService.getOwnerId(ctx))
-            .stream()
-            .map(categoryMapper::toDTO)
-            .toList();
+        ErrorHandler.tryEntity(weddingDAO.getByIdAndOwnerId(weddingId, userService.getOwnerId(ctx)), Notifications.WEDDING_NOT_FOUND.getDisplayName());
+        List<Category> entities = categoryDAO.getAllByWeddingIdAndOwnerId(weddingId, userService.getOwnerId(ctx));
+        List<CategoryDTO> categories = entities.stream().map(categoryMapper::toDTO).toList();
 
         respond(ctx, 200, Notifications.CATEGORY_GET_ALL.getDisplayName(),
         Map.of("data", categories));
@@ -81,38 +96,44 @@ public class CategoryController extends BaseController<Category, CategoryDTO> {
 
     // ________________________________________________________
 
-    private void createCategory(Context ctx) {
+    public void createCategory(Context ctx) {
 
         UUID weddingId = ErrorHandler.tryParseUUID(ctx.pathParam("weddingId"), Notifications.WEDDING_ID_INVALID.getDisplayName());
 
-        Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
-
-        Category category = categoryService.createCategory(weddingId, userService.getOwnerId(ctx), body);
+        Category category = categoryService.createCategory(weddingId, userService.getOwnerId(ctx), ctx);
 
         respond(ctx, 201, Notifications.CATEGORY_CREATED.getDisplayName(), Map.of("data", categoryMapper.toDTO(category)));
     }
 
     // ________________________________________________________
 
-    private void updateCategory(Context ctx) {
+    public void updateCategory(Context ctx) {
 
         UUID id = ErrorHandler.tryParseUUID(ctx.pathParam("id"), Notifications.CATEGORY_ID_INVALID.getDisplayName());
 
-        Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
-
-        Category category = categoryService.updateCategory(id, userService.getOwnerId(ctx), body);
+        Category category = categoryService.updateCategory(id, userService.getOwnerId(ctx), ctx);
 
         respond(ctx, 200, Notifications.CATEGORY_UPDATED.getDisplayName(), Map.of("data", categoryMapper.toDTO(category)));
     }
 
     // ________________________________________________________
 
-    private void deleteCategory(Context ctx) {
+    public void deleteCategory(Context ctx) {
 
         UUID id = ErrorHandler.tryParseUUID(ctx.pathParam("id"), Notifications.CATEGORY_ID_INVALID.getDisplayName());
 
-        categoryService.deleteCategory(id,userService.getOwnerId(ctx));
+        categoryService.deleteCategory(id, userService.getOwnerId(ctx));
 
         respond(ctx, 200, Notifications.CATEGORY_DELETED.getDisplayName(), null);
+    }
+
+    // ________________________________________________________
+
+    public void moveCategory(Context ctx) {
+
+        UUID id = ErrorHandler.tryParseUUID(ctx.pathParam("id"), Notifications.CATEGORY_ID_INVALID.getDisplayName());
+
+        Category category = categoryService.moveCategory(id, userService.getOwnerId(ctx), ctx);
+        respond(ctx, 200, Notifications.CATEGORY_UPDATED.getDisplayName(), Map.of("data", categoryMapper.toDTO(category)));
     }
 }
