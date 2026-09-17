@@ -1,12 +1,12 @@
 :root {
-  --accent: #c15b6a;
-  --bg: #fbf8f4;
+  --accent: #8a7a63;
+  --bg: #f3eee5;
   --surface: #ffffff;
-  --ink: #191d24;
-  --ink-soft: #525864;
-  --line: #e0ddda;
-  --accent-soft: #f9e8e9;
-  --accent-ink: #7b3842;
+  --ink: #2b2a26;
+  --ink-soft: #6f6a60;
+  --line: #ddd5c8;
+  --accent-soft: #ece5d8;
+  --accent-ink: #6d5f4b;
 
   font-family: "Work Sans", -apple-system, "Segoe UI", sans-serif;
   line-height: 1.5;

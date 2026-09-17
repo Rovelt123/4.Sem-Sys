@@ -8,12 +8,33 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class ErrorHandler {
 
     public static int tryParseInt(String value, String message) {
         try {
             return Integer.parseInt(value);
+        } catch (Exception e) {
+            throw new ApiException(400, message);
+        }
+    }
+
+    // ________________________________________________________
+
+    public static Float tryParseFloat(String value, String message) {
+        try {
+            return Float.parseFloat(value);
+        } catch (Exception e) {
+            throw new ApiException(400, message);
+        }
+    }
+
+    // ________________________________________________________
+
+    public static UUID tryParseUUID(String value, String message) {
+        try {
+            return UUID.fromString(value);
         } catch (Exception e) {
             throw new ApiException(400, message);
         }

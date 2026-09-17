@@ -9,25 +9,34 @@ function LandingpageSection(){
     return(
         <div className={styles.container}>
 
-            <div className={styles.upperContainer}>
+            <div className={styles.hero}>
 
-                <p className={styles.sloganText}>WEDDING PLANNING, MADE MANAGEABLE</p>
+                <img className={styles.heroImage} src="/hero.jpg" alt="" />
+                <div className={styles.heroWash}></div>
 
-                <h1 className={styles.titleText}>Say I Do to a wedding you can actually plan</h1>
+                <div className={styles.upperContainer}>
 
-                <p className={styles.text}>
-                    Say I Do breaks your wedding down into manageable pieces: 
-                    categories like venue, catering and attire, and the concrete tasks under each.
-                    You always see what's left, who's responsible
-                    and when it's due.
-                </p>
+                    <span className={styles.monogram}>S</span>
 
-                <NavLink to="/register" className={styles.signupButton}>Sign up, it's free</NavLink>
+                    <p className={styles.sloganText}>WEDDING PLANNING, MADE MANAGEABLE</p>
 
-                <p className={styles.smallText}>Already have an account?
-                    <NavLink to="/login" className={styles.textLink}> Log in </NavLink>
-                </p>
-                
+                    <h1 className={styles.titleText}>Say I Do to a wedding you can actually plan</h1>
+
+                    <p className={styles.text}>
+                        Say I Do breaks your wedding down into manageable pieces: 
+                        categories like venue, catering and attire, and the concrete tasks under each.
+                        You always see what's left, who's responsible
+                        and when it's due.
+                    </p>
+
+                    <NavLink to="/register" className={styles.signupButton}>Sign up, it's free</NavLink>
+
+                    <p className={styles.smallText}>Already have an account?
+                        <NavLink to="/login" className={styles.textLink}> Log in </NavLink>
+                    </p>
+
+                </div>
+
             </div>
 
 
@@ -69,7 +78,6 @@ function LandingpageSection(){
 
                 <p className={styles.footerText}>Say I Do</p>
                 <NavLink to="/privacy" className={styles.footerText}>Privacy policy</NavLink>
-                <p className={styles.footerText}>4. Semester - Datamatiker</p>
 
             </div>
 
