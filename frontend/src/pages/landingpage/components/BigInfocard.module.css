@@ -49,3 +49,42 @@
 .createButton:hover {
     background-color: var(--accent-soft);
 }
+
+.container {
+    max-width: 44rem;
+    min-height: 0;
+    margin: 5.5rem auto 0;
+    padding: 3rem 1.25rem 0;
+
+    background-color: transparent;
+
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+}
+
+.titleText {
+    color: var(--ink);
+
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 2.25rem;
+    font-weight: 500;
+    letter-spacing: 0.25rem;
+    text-transform: uppercase;
+}
+
+.createButton {
+    padding: 0.8125rem 1.75rem;
+
+    background-color: var(--accent-ink);
+    color: var(--surface);
+
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.125rem;
+    text-transform: uppercase;
+}
+
+.createButton:hover {
+    background-color: var(--ink);
+    color: var(--surface);
+}

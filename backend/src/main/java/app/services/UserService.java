@@ -1,12 +1,14 @@
 package app.services;
 
 import app.daos.UserDAO;
+import app.dtos.UserDTO;
 import app.entities.User;
 import app.enums.Notifications;
 import app.exceptions.ApiException;
 import app.server.Setup;
 import app.services.mail.BrevoMailSender;
 import app.utils.ErrorHandler;
+import io.javalin.http.Context;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -180,5 +182,15 @@ public class UserService {
         userDAO.update(user);
 
         emailService.sendConfirmationEmail(user);
+    }
+
+    // _______________________________________________________
+
+    public UUID getOwnerId(Context ctx) {
+        UserDTO user = ctx.attribute("user");
+        if (user == null || user.getId() == null) {
+            throw new ApiException(401, Notifications.WEDDING_LOGIN_REQUIRED.getDisplayName());
+        }
+        return user.getId();
     }
 }
