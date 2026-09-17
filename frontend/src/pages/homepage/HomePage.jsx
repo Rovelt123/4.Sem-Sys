@@ -104,6 +104,8 @@ function HomePage() {
   })
   const [showEditCategory, setShowEditCategory] = useState(false)
   const [editingCategory, setEditingCategory] = useState(null)
+  const [categoryToDelete, setCategoryToDelete] = useState(null)
+  const [showDeleteCategoryWarning, setShowDeleteCategoryWarning] = useState(false)
   
   
 
@@ -334,12 +336,18 @@ function HomePage() {
 
 // ________________________________________________________
 
+    const handleOpenDeleteCategory = (category) => {
+      setCategoryToDelete(category)
+      setShowDeleteCategoryWarning(true)
+    }
+
+// ________________________________________________________
 
 const handleEditCategory = async (e) => {
       e.preventDefault()
 
       setEditError('')
-      setEditingCategory(true)
+      
 
       const body = {
         title: editFormCategory.title,
@@ -385,9 +393,36 @@ const handleEditCategory = async (e) => {
 
   // ________________________________________________________
 
-  const handleDeleteCategory = (e) => {
+  const handleDeleteCategory = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE}/categories/${categoryToDelete.id}`,
+          {
+            method: 'DELETE',
+            headers: {
+              Authorization: `Bearer ${getToken()}`,
+            },
+          }
+        )
 
-  }
+        if (!response.ok) {
+          throw new Error('Could not delete wedding')
+        }
+
+        setCategories(
+          categories.filter(
+            category => category.id !== categoryToDelete.id
+          )
+        )
+
+        setCategoryToDelete(null)
+        setShowDeleteCategoryWarning(false)
+
+      } catch (error) {
+        console.error('Could not delete category:', error)
+      }
+    }
+  
 
   // ________________________________________________________
 
@@ -470,7 +505,7 @@ const handleEditCategory = async (e) => {
         {categories.map((category) => (
           <CategoryColumn
             key={category.id}
-            category={category} onEdit={handleOpenEditCategory} onDelete={handleDeleteCategory}
+            category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory}
           />
         ))}
       </div>
@@ -546,6 +581,21 @@ const handleEditCategory = async (e) => {
           </div>
         )}
 
+        {showDeleteCategoryWarning && categoryToDelete && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.deleteModal}>
+            <h2>Delete category?</h2>
+
+            <p> Are you sure you want to delete this Category?</p>
+
+            <div className={styles.modalActions}>
+              <button className={styles.deleteWedding} onClick={() => {setShowDeleteCategoryWarning(false), setCategoryToDelete(null)}}>Cancel</button>
+              <button className={styles.deleteWedding} onClick={handleDeleteCategory}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+
         {showEditCategory && (
           <div className={styles.modalOverlay}>
 
@@ -567,7 +617,7 @@ const handleEditCategory = async (e) => {
               />
 
               <div className={styles.modalActions}>
-                <button className={styles.createWedding} type="button" onClick={() => setShowEditCategory(false)}>
+                <button className={styles.deleteWedding} type="button" onClick={() => {setShowEditCategory(false), setEditingCategory(null)}} >
                   Cancel
                 </button>
 
