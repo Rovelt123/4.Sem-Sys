@@ -4,6 +4,7 @@ import app.daos.generic.EntityManagerDAOTest;
 import app.daos.generic.IDAO;
 import app.entities.Category;
 import app.entities.Wedding;
+import app.enums.Categories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -107,11 +108,60 @@ class CategoryDAOTest extends EntityManagerDAOTest<Category> {
 
     @Test
     void getByIdAndOwnerId() {
+        userDAO.create(testUser2);
+
+        categoryDAO.create(category);
+
+        em.flush();
+        em.clear();
+
+        Category found = categoryDAO.getByIdAndOwnerId(category.getId(), testUser2.getId());
+
+        assertNull(found);
+
+    }
+
+    // ________________________________________________________
+
+    @Test
+    void getByIdAndOwnerIdReturnNullWhenOwnerIsWrong() {
+
+        Category category3 = Category.builder()
+                .title(Categories.DRINKS.getDisplayName())
+                .position(2)
+                .wedding(wedding)
+                .build();
+
+        categoryDAO.create(category);
+        categoryDAO.create(category3);
+
+        em.flush();
+        em.clear();
+
+        Category found = categoryDAO.getByIdAndOwnerId(category3.getId(), testUser.getId());
+
+        assertNotNull(found);
+        assertEquals("Alcohol & soft drinks", found.getTitle());
+        assertEquals(wedding.getId(), found.getWedding().getId());
+
     }
 
     // ________________________________________________________
 
     @Test
     void getUncategorized() {
+
+       Category uncategorized = Category.builder()
+                .title(Categories.UNCATEGORIZED.getDisplayName())
+                .position(3)
+                .wedding(wedding)
+                .build();
+
+        categoryDAO.create(category);
+
+        em.flush();
+        em.clear();
+
+
     }
 }
