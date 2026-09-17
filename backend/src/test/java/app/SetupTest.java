@@ -36,7 +36,7 @@ public abstract class SetupTest {
     public LocalDate date = LocalDate.of(2026, 12, 24);
     public LocalDate dateTwo = LocalDate.of(2026, 11, 11);
 
-    float weddingBudget = 100;
+    protected float weddingBudget = 100;
 
 
 
