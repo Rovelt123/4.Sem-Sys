@@ -6,6 +6,7 @@ import app.daos.CategoryDAO;
 import app.daos.UserDAO;
 import app.daos.WeddingDAO;
 import app.entities.Category;
+import app.entities.Task;
 import app.entities.User;
 import app.entities.Wedding;
 import app.enums.Categories;
@@ -45,6 +46,9 @@ public abstract class SetupTest {
 
     protected Category category;
     protected Category category2;
+
+    protected Task task;
+    protected Task task2;
 
     // ________________________________________________________
 
@@ -115,7 +119,19 @@ public abstract class SetupTest {
               .position(2)
               .wedding(wedding2)
               .build();
-    }
+
+            task = Task.builder()
+                    .title("find catering company")
+                    .position(0)
+                    .category(category)
+                    .build();
+
+            task2 = Task.builder()
+                    .title("Decide menu")
+                    .position(1)
+                    .category(category)
+                    .build();
+        }
 
     // ________________________________________________________
 
