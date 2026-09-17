@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import styles from './HomePage.module.css'
 import TaskList from './components/TaskList.jsx'
+import CategoryColumn from './components/CategoryColumn.jsx'
 import {getToken, getUser, clearSession } from '../../utils/storage'
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
 
@@ -91,8 +92,19 @@ function HomePage() {
     budget: '',
     description: '',
   })
+
+ 
   const [editError, setEditError] = useState('')
   const [editingWedding, setEditingWedding] = useState(false)
+
+  const [categories, setCategories] = useState([])
+
+  const [editFormCategory, setEditFormCategory] = useState({
+    title: '',
+  })
+  const [showEditCategory, setShowEditCategory] = useState(false)
+  const [editingCategory, setEditingCategory] = useState(null)
+  
   
 
   const done = tasks.filter((task) => task.done).length
@@ -143,6 +155,44 @@ function HomePage() {
     loadWedding()
 
   }, [])
+
+  useEffect(() => {
+  if (!wedding) {
+    return
+  }
+
+  const loadCategories = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/weddings/${wedding.id}/categories`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Could not load categories')
+      }
+
+      const result = await response.json()
+      const categories = result.data.data
+
+      console.log('Category response:', result)
+      console.log('Categories:', categories)
+
+      setCategories(categories)
+
+    } catch (error) {
+      console.error('Could not load categories:', error)
+      setCategories([])
+    }
+  }
+
+  loadCategories()
+}, [wedding])
+
 
 
 
@@ -267,6 +317,82 @@ function HomePage() {
 
   // ________________________________________________________
 
+  const handleEditChangeCategory = (e) => {
+      setEditFormCategory({...editFormCategory, [e.target.name]: e.target.value,})
+    }
+
+  // ________________________________________________________
+
+   const handleOpenEditCategory = (category) => {
+      setEditingCategory(category)
+      setEditFormCategory({
+        title: category.title ?? '',
+      })
+      setEditError('')
+      setShowEditCategory(true)
+    }
+
+// ________________________________________________________
+
+
+const handleEditCategory = async (e) => {
+      e.preventDefault()
+
+      setEditError('')
+      setEditingCategory(true)
+
+      const body = {
+        title: editFormCategory.title,
+      }
+
+      try {
+        const response = await fetch(
+          `${API_BASE}/categories/${editingCategory.id}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify(body),
+          }
+        )
+
+        if (!response.ok) {
+          const text = await response.text()
+          setEditError(
+            parseErrorMessage(text) || 'Could not update category'
+          )
+          return
+        }
+
+        setCategories(
+          categories.map((category) =>
+            category.id === editingCategory.id
+              ? { ...category, ...body }
+              : category
+          )
+        )
+
+        setShowEditCategory(false)
+
+      } catch {
+        setEditError('Could not connect to the server')
+      } finally {
+        setEditingCategory(false)
+      }
+    }
+
+  // ________________________________________________________
+
+  const handleDeleteCategory = (e) => {
+
+  }
+
+  // ________________________________________________________
+
+ 
+
   return (
     <div className={styles.homePage}>
       <header className={styles.topBar}>
@@ -337,16 +463,17 @@ function HomePage() {
               </div>
             </section>
 
-            <div className={styles.sectionHead}>
-              <h2 className={styles.sectionTitle}> Tasks </h2>
-
-              <span className={styles.sectionCount}> {done} of {tasks.length} done </span>
-            </div>
-
-            <TaskList tasks={tasks} onToggle={toggleTask} />
+            
           </>
         )}
-
+      <div className={styles.categoryBoard}>
+        {categories.map((category) => (
+          <CategoryColumn
+            key={category.id}
+            category={category} onEdit={handleOpenEditCategory} onDelete={handleDeleteCategory}
+          />
+        ))}
+      </div>
       </main>
 
       <footer className={styles.footer}>
@@ -413,6 +540,40 @@ function HomePage() {
                   {editingWedding ? 'Saving...' : 'Save changes'}
                 </button>
 
+              </div>
+            </form>
+
+          </div>
+        )}
+
+        {showEditCategory && (
+          <div className={styles.modalOverlay}>
+
+            <form className={styles.editCategoryModal} onSubmit={handleEditCategory}>
+              <h2>Edit category</h2>
+              {editError && (
+                <p className={styles.editError}> {editError} </p>
+              )}
+
+              <label htmlFor="category-title"> Category name </label>
+
+              <input
+                id="category-title"
+                name="title"
+                type="text"
+                value={editFormCategory.title}
+                onChange={handleEditChangeCategory}
+                required
+              />
+
+              <div className={styles.modalActions}>
+                <button className={styles.createWedding} type="button" onClick={() => setShowEditCategory(false)}>
+                  Cancel
+                </button>
+
+                <button className={styles.createWedding} type="submit">
+                  Save changes
+                </button>
               </div>
             </form>
 
