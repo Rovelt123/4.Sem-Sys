@@ -5,6 +5,7 @@ import RegisterPage from "./pages/register/RegisterPage";
 import HomePage from "./pages/homepage/HomePage";
 import PrivacyPolicyPage from "./pages/privacy/PrivacyPolicyPage";
 import NotFoundPage from "./pages/notfound/NotFoundPage";
+import CreateWeddingPage from "./pages/createwedding/CreateWeddingPage";
 import { getToken } from "./utils/storage";
 import './App.css';
 
@@ -28,6 +29,14 @@ function App() {
         element={
           <RequireToken>
             <HomePage />
+          </RequireToken>
+        }
+      />
+      <Route
+        path="/create"
+        element={
+          <RequireToken>
+            <CreateWeddingPage />
           </RequireToken>
         }
       />
