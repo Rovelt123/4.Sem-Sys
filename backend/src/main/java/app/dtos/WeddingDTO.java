@@ -20,6 +20,9 @@ public class WeddingDTO {
     private String location;
     private float budget;
     private String description;
+    private int taskCount;
+    private long completedTaskCount;
+    private double totalEstimatedHours;
 
     @Builder.Default
     private Set<CategoryDTO> categories = new HashSet<>();
