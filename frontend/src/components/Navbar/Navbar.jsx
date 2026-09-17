@@ -1,7 +1,11 @@
 import styles from "./Navbar.module.css";
+
+import Buttons from "./Buttons.jsx";
+
 import { NavLink } from "react-router";
-function Navbar(){
-    return(
+
+function Navbar({ hideButtons = false }) {
+    return (
         <div className={styles.container}>
             <div className={styles.logoContainer}>
                 <NavLink to="/" className={styles.logoLink}>
@@ -10,20 +14,10 @@ function Navbar(){
                     </p>
                 </NavLink>
             </div>
-            
-            <div className={styles.loginRegisterContainer}>
-                
-                <NavLink to="/login" className={styles.loginButton}>
-                    Login
-                </NavLink>
-                    
-                <NavLink to="/register" className={styles.signupButton}>
-                    Sign up
-                </NavLink>
-            </div>
+
+            {!hideButtons && <Buttons />}
         </div>
     );
-
 }
 
 export default Navbar;

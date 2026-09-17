@@ -6,6 +6,7 @@ import HomePage from "./pages/homepage/HomePage";
 import PrivacyPolicyPage from "./pages/privacy/PrivacyPolicyPage";
 import NotFoundPage from "./pages/notfound/NotFoundPage";
 import CreateWeddingPage from "./pages/createwedding/CreateWeddingPage";
+import ConfirmEmailPage from './pages/ConfirmEmailPage/ConfirmEmailPage';
 import { getToken } from "./utils/storage";
 import './App.css';
 
@@ -24,6 +25,7 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/privacy" element={<PrivacyPolicyPage />} />
+      <Route path="/confirm-email" element={<ConfirmEmailPage />}/>
       <Route
         path="/homepage"
         element={

@@ -11,6 +11,10 @@ on:
     branches:
       - Main
 
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   test:
     name: Build Java backend
@@ -42,10 +46,11 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H "${{ secrets.SERVER_IP }}" >> ~/.ssh/known_hosts
 
-      - name: Pull and build backend on server
+      - name: Deploy backend and check health
+        timeout-minutes: 10
         if: github.ref == 'refs/heads/Main'
         run: |
-          ssh -i ~/.ssh/deploy_key "${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}" '
+          ssh -o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=3 -i ~/.ssh/deploy_key "${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}" '
             set -e
             mkdir -p ~/4.Sem
             if [ ! -d ~/4.Sem/backend-repo/.git ]; then
@@ -57,11 +62,22 @@ jobs:
             cd backend
             mvn package
             mkdir -p ~/4.Sem/backend-app
-            cp target/backend.jar ~/4.Sem/backend-app/backend.jar
+            cp target/backend.jar ~/4.Sem/backend-app/backend.jar.new
+            mv ~/4.Sem/backend-app/backend.jar.new ~/4.Sem/backend-app/backend.jar
             cd ~/docker-postgres
-            docker compose up -d sys2-api
-            sleep 5
-            docker compose exec -T sys2-api wget -qO- http://127.0.0.1:7070/api/health
+            docker compose up -d --no-deps --force-recreate sys2-api
+            for attempt in $(seq 1 12); do
+              echo "Checking backend health ($attempt/12)..."
+              if timeout 10s docker compose exec -T sys2-api wget -T 5 -qO- http://127.0.0.1:7070/api/health; then
+                echo "Backend is healthy."
+                exit 0
+              fi
+              sleep 5
+            done
+            echo "Backend failed to become healthy."
+            docker compose ps sys2-api
+            docker compose logs --no-color --tail=100 sys2-api
+            exit 1
           '
 
       - name: Notify Discord about test result
