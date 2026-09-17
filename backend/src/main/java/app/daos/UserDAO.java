@@ -28,9 +28,9 @@ public class UserDAO extends EntityManagerDAO<User> {
         String jpql = "SELECT u FROM User u WHERE u.emailConfirmationToken = :token";
 
         return executeQuery(() ->
-                em.createQuery(jpql, User.class)
-                        .setParameter("token", token)
-                        .getSingleResult()
+            em.createQuery(jpql, User.class)
+                .setParameter("token", token)
+                .getSingleResult()
         );
     }
 
@@ -40,9 +40,9 @@ public class UserDAO extends EntityManagerDAO<User> {
         String jpql = "SELECT u FROM User u WHERE u.passwordResetToken = :token";
 
         return executeQuery(() ->
-                em.createQuery(jpql, User.class)
-                        .setParameter("token", token)
-                        .getSingleResult()
+            em.createQuery(jpql, User.class)
+                .setParameter("token", token)
+                .getSingleResult()
         );
     }
 

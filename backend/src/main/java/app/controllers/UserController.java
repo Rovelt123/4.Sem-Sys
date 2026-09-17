@@ -58,13 +58,9 @@ public class UserController extends BaseController<User, UserDTO> {
             patch("users/me/password", controller::changePassword, Role.USER);
             post("users/auth/resend-confirmation", controller::resendConfirmationEmail, Role.ANYONE);
 
-            get("/users", controller::getAll, Role.USER);
-            get("/user/{id}", controller::getByID, Role.USER);
         };
     }
-
     // ________________________________________________________
-
     @Override
     protected List<User> getAllEntities() {
         return userDAO.getAll();
@@ -249,6 +245,6 @@ public class UserController extends BaseController<User, UserDTO> {
 
         userService.resendConfirmationEmail(email);
 
-        respond(ctx, 200, "If the email address belongs to an unverified account, we will send a verification email.", null);
+        respond(ctx, 200, Notifications.EMAIL_CONFIRMATION_RESENT.getDisplayName(), null);
     }
 }
