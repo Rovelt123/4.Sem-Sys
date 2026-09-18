@@ -9,16 +9,20 @@ import app.enums.Priority;
 import app.exceptions.ApiException;
 import app.server.Setup;
 import app.utils.ErrorHandler;
+import io.javalin.http.Context;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.UUID;
 
 public class TaskService {
 
     private final TaskDAO taskDAO;
     private final CategoryDAO categoryDAO;
+    private final MessageService messageService = new MessageService();
 
     // ________________________________________________________
 
@@ -35,73 +39,33 @@ public class TaskService {
 
     // ________________________________________________________
 
-    public Task createTask(UUID categoryId, UUID ownerId, Map<String, String> body) {
+    public Task createTask(UUID categoryId, UUID ownerId, Context ctx) {
 
+        Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
         Category category = ErrorHandler.tryEntity(categoryDAO.getByIdAndOwnerId(categoryId, ownerId), Notifications.CATEGORY_NOT_FOUND.getDisplayName());
-
-        String title = ErrorHandler.tryString(body.get("title"), Notifications.TASK_TITLE_REQUIRED.getDisplayName());
-
-        float price = ErrorHandler.tryParseFloat(body.get("price"),Notifications.MUST_BE_FLOAT.getDisplayName());
-
-        String link = body.get("link");
-
-        LocalDate deadline = ErrorHandler.tryParseLocalDate(body.get("deadline"), Notifications.TASK_DEADLINE_INVALID.getDisplayName());
-
-        float estimatedHours = validateEstimatedHours(body.get("estimatedHours"));
-
-        Priority priority = body.get("priority") == null
-            ? Priority.LOW
-            : ErrorHandler.tryParseEnum(Priority.class, body.get("priority"), Notifications.TASK_PRIORITY_INVALID.getDisplayName()
-        );
-
-        int position = taskDAO.getAllByCategoryIdAndOwnerId(categoryId, ownerId).size();
-
-        Task task = Task.builder()
-            .title(title)
-            .description(body.get("description"))
-            .link(link)
-            .price(price)
-            .deadline(deadline)
-            .estimatedHours(estimatedHours)
-            .priority(priority)
-            .position(position)
-            .completed(false)
-            .category(category)
-            .build();
-
+        Task task = new Task();
+        applyDetails(task, body);
+        int position = category.getTasks().stream().mapToInt(Task::getPosition).max().orElse(-1) + 1;
+        task.setPosition(position);
+        category.addTask(task);
         return taskDAO.create(task);
     }
 
     // ________________________________________________________
 
-    public Task updateTask(UUID id, UUID ownerId, Map<String, String> body) {
+    public Task updateTask(UUID id, UUID ownerId, Context ctx) {
 
+        Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
         Task task = ErrorHandler.tryEntity(taskDAO.getByIdAndOwnerId(id, ownerId), Notifications.TASK_NOT_FOUND.getDisplayName());
-
-        String title = ErrorHandler.tryString(body.get("title"), Notifications.TASK_TITLE_REQUIRED.getDisplayName());
-
-        task.setTitle(title);
-        task.setDescription(body.get("description"));
-        task.setLink(body.get("link"));
-        task.setPrice(ErrorHandler.tryParseFloat(body.get("price"), Notifications.TASK_PRICE_INVALID.getDisplayName()));
-        task.setDeadline(ErrorHandler.tryParseLocalDate(body.get("deadline"), Notifications.WEDDING_DATE_INVALID.getDisplayName()));
-        task.setEstimatedHours(validateEstimatedHours(body.get("estimatedHours")));
-
-        if (body.get("priority") != null) {
-            task.setPriority(ErrorHandler.tryParseEnum(Priority.class, body.get("priority"), Notifications.TASK_PRIORITY_INVALID.getDisplayName()));
-        }
-
+        applyDetails(task, body);
         return taskDAO.update(task);
     }
 
     // ________________________________________________________
 
     public Task toggleCompleted(UUID id, UUID ownerId) {
-
         Task task = ErrorHandler.tryEntity(taskDAO.getByIdAndOwnerId(id, ownerId), Notifications.TASK_NOT_FOUND.getDisplayName());
-
         task.setCompleted(!task.isCompleted());
-
         return taskDAO.update(task);
     }
 
@@ -109,25 +73,71 @@ public class TaskService {
 
     public void deleteTask(UUID id, UUID ownerId) {
         Task task = ErrorHandler.tryEntity(taskDAO.getByIdAndOwnerId(id, ownerId), Notifications.TASK_NOT_FOUND.getDisplayName());
-        taskDAO.delete(task);
+        taskDAO.deleteAndUpdatePositions(task);
     }
 
     // ________________________________________________________
 
-    private float validateEstimatedHours(String value) {
+    public Task moveTask(UUID id, UUID ownerId, Context ctx) {
 
-        if (value == null || value.isBlank()) {
-            return 0;
+
+        Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
+        int position = ErrorHandler.tryParseInt(body.get("position"), Notifications.POSITION_INVALID.getDisplayName());
+
+        UUID targetId = body.get("categoryId") == null ? null : ErrorHandler.tryParseUUID(body.get("categoryId"), Notifications.CATEGORY_ID_INVALID.getDisplayName());
+
+        Task task = ErrorHandler.tryEntity(taskDAO.getByIdAndOwnerId(id, ownerId), Notifications.TASK_NOT_FOUND.getDisplayName());
+        Category source = task.getCategory();
+        Category target = targetId == null ? source : ErrorHandler.tryEntity(
+                categoryDAO.getByIdAndOwnerId(targetId, ownerId),
+                Notifications.CATEGORY_NOT_FOUND.getDisplayName()
+        );
+
+        if (!source.getWedding().getId().equals(target.getWedding().getId())) {
+            throw new ApiException(400, Notifications.TASK_MOVE_DIFFERENT_WEDDING.getDisplayName());
         }
 
-        float hours = ErrorHandler.tryParseFloat(value, Notifications.TASK_ESTIMATE_INVALID.getDisplayName());
+        List<Task> targetTasks = orderedTasks(target);
 
-        if (hours < 0) {
-            throw new ApiException(400, Notifications.TASK_ESTIMATE_RANGE.getDisplayName());
+        targetTasks.remove(task);
+
+        if (position < 0 || position > targetTasks.size()) {
+            throw new ApiException(400, messageService.buildMessage(Notifications.POSITION_RANGE, String.valueOf(targetTasks.size())));
         }
 
-        return hours;
+        targetTasks.add(position, task);
+        return taskDAO.moveTask(task, target, targetTasks);
+
     }
 
+    // ________________________________________________________
 
+    private List<Task> orderedTasks(Category category) {
+        return new ArrayList<>(category.getTasks().stream()
+                .sorted(Comparator.comparingInt(Task::getPosition).thenComparing(Task::getId)).toList());
+    }
+
+    // ________________________________________________________
+
+    private void applyDetails(Task task, Map<String, String> body) {
+
+        String title = ErrorHandler.tryString(body.get("title"), Notifications.TASK_TITLE_REQUIRED.getDisplayName());
+
+        float price = ErrorHandler.tryParseFloat(body.get("price"), Notifications.MUST_BE_FLOAT.getDisplayName());
+
+        LocalDate deadline = ErrorHandler.tryParseLocalDate(body.get("deadline"), Notifications.TASK_DEADLINE_INVALID.getDisplayName());
+        String link = body.get("link");
+
+        float hours = ErrorHandler.tryParseFloat(body.get("estimatedHours"), Notifications.TASK_ESTIMATE_INVALID.getDisplayName());
+
+        Priority priority = body.get("priority") == null ? task.getPriority() : ErrorHandler.tryParseEnum(Priority.class, body.get("priority"), Notifications.TASK_PRIORITY_INVALID.getDisplayName());
+
+        task.setTitle(title);
+        task.setDescription(body.get("description"));
+        task.setLink(link);
+        task.setPrice(price);
+        task.setDeadline(deadline);
+        task.setEstimatedHours(hours);
+        task.setPriority(priority);
+    }
 }

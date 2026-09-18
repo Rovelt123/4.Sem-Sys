@@ -17,6 +17,9 @@ public class CategoryDTO {
     private int position;
     private UUID weddingId;
     private String title;
+    private int taskCount;
+    private long completedTaskCount;
+    private double totalEstimatedHours;
 
     @Builder.Default
     private Set<TaskDTO> tasks = new HashSet<>();

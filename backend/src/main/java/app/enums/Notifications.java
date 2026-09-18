@@ -37,6 +37,10 @@ public enum Notifications {
     TOKEN_MISSING("Token is missing"),
     LINK_EXPIRED("Link is expired or invalid"),
     EMAIL_CONFIRMED("Email has been confirmed"),
+    EMAIL_CONFIRMATION_RESENT("If the email address belongs to an unverified account, we will send a verification email."),
+    USER_NOT_FOUND("User not found."),
+    USER_ID_INVALID("User id must be a valid UUID."),
+    ADMIN_REQUIRED("Administrator access is required."),
 
 
     // WEDDING
@@ -65,7 +69,8 @@ public enum Notifications {
     CATEGORY_ID_INVALID("Category id must be a valid UUID."),
     CATEGORY_TITLE_REQUIRED("You must enter a category title."),
     CATEGORY_UNCATEGORIZED_DELETE("The Uncategorized category cannot be deleted."),
-    CATEGORY_UNCATEGORIZED_NOT_FOUND("Uncategorized category could not be found."),
+    CATEGORY_NAME_RESERVED("Uncategorized is a reserved category name."),
+    CATEGORY_UNCATEGORIZED_RENAME("The Uncategorized category cannot be renamed or replaced."),
 
     // TASK
     TASK_CREATED("Task created."),
@@ -75,14 +80,13 @@ public enum Notifications {
     TASK_GET_ALL("Tasks fetched."),
     TASK_ID_INVALID("Task id must be a valid UUID."),
     TASK_TITLE_REQUIRED("You must enter a task title."),
-    TASK_PRICE_INVALID("Price must be a number."),
-    TASK_PRICE_RANGE("Price must not be negative."),
-    TASK_LINK_INVALID("Link must be a valid HTTP or HTTPS URL."),
     TASK_DEADLINE_INVALID("Deadline must be a valid date in YYYY-MM-DD format."),
     TASK_PRIORITY_INVALID("Priority must be LOW, MEDIUM or HIGH."),
     TASK_ESTIMATE_INVALID("Estimated hours must be a number."),
-    TASK_ESTIMATE_RANGE("Estimated hours must not be negative."),
     TASK_COMPLETED_UPDATED("Task completion status updated."),
+    TASK_MOVE_DIFFERENT_WEDDING("Tasks can only be moved between categories in the same wedding."),
+    POSITION_INVALID("position must be an integer."),
+    POSITION_RANGE("position must be between 0 and %s."),
 
 
     // GENERICS

@@ -34,8 +34,7 @@ public class Category {
     @Builder.Default
     @OneToMany(
             mappedBy = "category",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+            cascade = CascadeType.ALL
     )
     private Set<Task> tasks = new HashSet<>();
 
