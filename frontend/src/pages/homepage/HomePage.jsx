@@ -394,34 +394,36 @@ const handleEditCategory = async (e) => {
   // ________________________________________________________
 
   const handleDeleteCategory = async () => {
-      try {
-        const response = await fetch(
-          `${API_BASE}/categories/${categoryToDelete.id}`,
-          {
-            method: 'DELETE',
-            headers: {
-              Authorization: `Bearer ${getToken()}`,
-            },
-          }
-        )
-
-        if (!response.ok) {
-          throw new Error('Could not delete wedding')
+    try {
+      const response = await fetch(
+        `${API_BASE}/categories/${categoryToDelete.id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
         }
+      )
 
-        setCategories(
-          categories.filter(
-            category => category.id !== categoryToDelete.id
-          )
-        )
-
-        setCategoryToDelete(null)
-        setShowDeleteCategoryWarning(false)
-
-      } catch (error) {
-        console.error('Could not delete category:', error)
+      if (!response.ok) {
+        const text = await response.text()
+        console.log('DELETE error response:', text)
+        throw new Error('Could not delete category')
       }
+
+      setCategories(
+        categories.filter(
+          category => category.id !== categoryToDelete.id
+        )
+      )
+
+      setCategoryToDelete(null)
+      setShowDeleteCategoryWarning(false)
+
+    } catch (error) {
+      console.error('Could not delete category:', error)
     }
+  }
   
 
   // ________________________________________________________
