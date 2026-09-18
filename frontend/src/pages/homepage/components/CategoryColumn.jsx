@@ -1,6 +1,6 @@
 import styles from './CategoryColumn.module.css'
 
-function CategoryColumn( { category, onEdit, onDelete, onAddTask, onDeleteTask }){
+function CategoryColumn( { category, onEdit, onDelete, onAddTask, onEditTask, onDeleteTask }){
 
     const isUncategorized = category.title === 'Uncategorized'
 
@@ -38,6 +38,7 @@ function CategoryColumn( { category, onEdit, onDelete, onAddTask, onDeleteTask }
                                 <span className={styles.price}>{task.price} kr</span>
                             )}
 
+                            <button className={styles.iconButton} onClick={() => onEditTask(task)} aria-label={`Edit ${task.title}`}> ✎ </button>
                             <button className={styles.iconButton} onClick={() => onDeleteTask(task)} aria-label={`Delete ${task.title}`}>×</button>
                         </span>
                     </li>
