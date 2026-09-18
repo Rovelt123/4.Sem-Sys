@@ -146,3 +146,11 @@
   color: var(--ink);
   border-bottom: 1px solid var(--line);
 }
+
+.registerCard h1 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 2rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}

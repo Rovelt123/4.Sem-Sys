@@ -124,3 +124,11 @@
   background: #fdecec;
   border-radius: 0.75rem;
 }
+
+.createCard h1 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 2rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
