@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router'
 import styles from './HomePage.module.css'
 import CategoryColumn from './components/CategoryColumn.jsx'
 import {getToken, getUser, clearSession } from '../../utils/storage'
+import { DndContext } from '@dnd-kit/core'
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
 
 
@@ -698,7 +699,100 @@ const handleEditCategory = async (e) => {
     }
   }
 
- 
+  // ________________________________________________________
+
+  const moveTaskToCategory = async (task, targetCategory) => {
+    const body = {
+      categoryId: targetCategory.id,
+      position: String(targetCategory.tasks?.length ?? 0),
+    }
+    const sourceCategoryId = task.categoryId
+    const targetCategoryId = targetCategory.id
+
+    if (sourceCategoryId === targetCategoryId) {
+          return
+      }
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/tasks/${task.id}/position`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify(body),
+        }
+      )
+
+      if (!response.ok) {
+        const text = await response.text()
+        setEditError(parseErrorMessage(text) || 'could not move task')
+        return
+      }
+      const result = await response.json()
+      const updatedTask = result.data.data
+
+      setCategories(categories.map((category) => {
+        if (category.id === sourceCategoryId) {
+          return {
+            ...category,
+            tasks: (category.tasks ?? []).filter(
+              (currentTask) => currentTask.id !== task.id
+            ),
+          }
+        }
+
+        if (category.id === targetCategoryId) {
+          return {
+            ...category,
+            tasks: [
+              ...(category.tasks ?? []),
+              updatedTask,
+            ],
+          }
+        }
+
+       return category
+      })
+    )
+    } catch {
+      setEditError('Could not move task')
+    }
+
+  }
+
+  // ________________________________________________________
+
+  const handleDragEnd = ({ active, over }) => {
+    if (!over) {
+      return
+    }
+
+    let draggedTask = null
+
+    for (const category of categories) {
+      const foundTask = (category.tasks ?? []).find(
+        (task) => task.id === active.id
+      )
+
+      if (foundTask) {
+        draggedTask = foundTask
+        break
+      }
+    }
+
+    const targetCategory = categories.find(
+      (category) => category.id === over.id
+    )
+
+    if (!draggedTask || !targetCategory) {
+      return
+    }
+
+    moveTaskToCategory(draggedTask, targetCategory)
+  }
 
   return (
     <div className={styles.homePage}>
@@ -774,20 +868,22 @@ const handleEditCategory = async (e) => {
             
           </>
         )}
-      <div className={styles.categoryBoard}>
-        {categories.map((category) => (
-          <CategoryColumn
-            key={category.id}
-            category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onEditTask={handleOpenEditTask} onDeleteTask={handleOpenDeleteTask}
-          />
-        ))}
+      <DndContext onDragEnd={handleDragEnd}>
+        <div className={styles.categoryBoard}>
+          {categories.map((category) => (
+            <CategoryColumn
+              key={category.id}
+              category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onEditTask={handleOpenEditTask} onDeleteTask={handleOpenDeleteTask}
+            />
+          ))}
 
-        {wedding && (
-          <button className={styles.addCategoryColumn} onClick={() => setShowCreateCategory(true)}>
-            + New category
-          </button>
-        )}
-      </div>
+          {wedding && (
+            <button className={styles.addCategoryColumn} onClick={() => setShowCreateCategory(true)}>
+              + New category
+            </button>
+          )}
+        </div>
+      </DndContext>
       </main>
 
       <footer className={styles.footer}>
