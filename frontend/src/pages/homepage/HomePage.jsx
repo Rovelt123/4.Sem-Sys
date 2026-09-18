@@ -1,26 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import styles from './HomePage.module.css'
-import TaskList from './components/TaskList.jsx'
 import CategoryColumn from './components/CategoryColumn.jsx'
 import {getToken, getUser, clearSession } from '../../utils/storage'
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
 
-const PLACEHOLDER_WEDDING = {
-  title: 'Our wedding',
-  date: '2027-06-12',
-  venue: 'Kokkedal Slot',
-  guests: 84,
-}
-
-const PLACEHOLDER_TASKS = [
-  { id: 1, title: 'Book the venue', category: 'Venue', due: '2026-10-01', priority: 'High', done: true },
-  { id: 2, title: 'Send save the date', category: 'Guests', due: '2026-11-15', priority: 'High', done: true },
-  { id: 3, title: 'Find a photographer', category: 'Vendors', due: '2027-02-01', priority: 'High', done: false },
-  { id: 4, title: 'Choose the menu', category: 'Catering', due: '2027-01-20', priority: 'Medium', done: false },
-  { id: 5, title: 'Order the cake', category: 'Catering', due: '2027-03-10', priority: 'Medium', done: false },
-  { id: 6, title: 'Plan the seating', category: 'Guests', due: '2027-05-01', priority: 'Low', done: false },
-]
 
 
 
@@ -80,7 +64,6 @@ function HomePage() {
 
   const [showDeleteWarning, setShowDeleteWarning] = useState(false)
 
-  const [tasks] = useState(PLACEHOLDER_TASKS)
   const navigate = useNavigate()
 
   const [showEditWedding, setShowEditWedding] = useState(false)
@@ -113,6 +96,8 @@ function HomePage() {
     title: '',
   })
 
+  const [taskToDelete, setTaskToDelete] = useState(null)
+  const [showDeleteTaskWarning, setShowDeleteTaskWarning] = useState(false)
   const [showCreateTask, setShowCreateTask] = useState(false)
   const [createTaskCategory, setCreateTaskCategory] = useState(null)
   const [creatingTask, setCreatingTask] = useState(false)
@@ -125,8 +110,10 @@ function HomePage() {
     description: '',
   })
 
-  const done = tasks.filter((task) => task.done).length
-  const percent = Math.round((done / tasks.length) * 100)
+  const taskCount = categories.reduce(
+    (total, category) => total + (category.tasks?.length ?? 0),
+    0
+  )
   const days = wedding ? daysUntil(wedding.date) : 0
     // ________________________________________________________
 
@@ -493,6 +480,48 @@ const handleEditCategory = async (e) => {
 
   // ________________________________________________________
 
+  const handleOpenDeleteTask = (task) => {
+    setTaskToDelete(task)
+    setShowDeleteTaskWarning(true)
+  }
+
+  // ________________________________________________________
+
+  const handleDeleteTask = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/tasks/${taskToDelete.id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Could not delete task')
+      }
+
+      setCategories(
+        categories.map((category) => ({
+          ...category,
+          tasks: (category.tasks ?? []).filter(
+            (task) => task.id !== taskToDelete.id
+          ),
+        }))
+      )
+
+      setTaskToDelete(null)
+      setShowDeleteTaskWarning(false)
+
+    } catch (error) {
+      console.error('Could not delete task:', error)
+    }
+  }
+
+  // ________________________________________________________
+
   const handleOpenCreateTask = (category) => {
     setCreateTaskCategory(category)
 
@@ -643,13 +672,9 @@ const handleEditCategory = async (e) => {
                 </div>
 
                 <div className={styles.stat}>
-                  <span className={styles.statValue}> {percent}% </span>
-                  <span className={styles.statLabel}> done </span>
+                  <span className={styles.statValue}> {taskCount} </span>
+                  <span className={styles.statLabel}> tasks </span>
                 </div>
-              </div>
-
-              <div className={styles.progress}>
-                <div className={styles.bar} style={{ width: percent + '%' }} />
               </div>
             </section>
 
@@ -660,7 +685,7 @@ const handleEditCategory = async (e) => {
         {categories.map((category) => (
           <CategoryColumn
             key={category.id}
-            category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask}
+            category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onDeleteTask={handleOpenDeleteTask}
           />
         ))}
 
@@ -818,6 +843,21 @@ const handleEditCategory = async (e) => {
                 </button>
               </div>
             </form>
+          </div>
+        )}
+
+        {showDeleteTaskWarning && taskToDelete && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.deleteModal}>
+              <h2>Delete task?</h2>
+
+              <p> Are you sure you want to delete {taskToDelete.title}?</p>
+
+              <div className={styles.modalActions}>
+                <button className={styles.deleteWedding} onClick={() => {setShowDeleteTaskWarning(false), setTaskToDelete(null)}}>Cancel</button>
+                <button className={styles.deleteWedding} onClick={handleDeleteTask}>Delete</button>
+              </div>
+            </div>
           </div>
         )}
 

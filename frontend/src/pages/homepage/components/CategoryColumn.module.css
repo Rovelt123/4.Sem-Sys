@@ -119,3 +119,23 @@
   font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 1rem;
 }
+
+.taskList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.task {
+  padding: 0.6875rem 0.75rem;
+
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+
+  cursor: grab;
+}
+
+.task:hover {
+  border-color: var(--accent);
+}

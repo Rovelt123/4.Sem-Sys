@@ -78,8 +78,8 @@
   cursor: pointer;
 }
 .createWedding:hover {
-  color: var(--rose-dark);
-  border-color: var(--rose-dark);
+  color: var(--danger-ink);
+  border-color: var(--danger-ink);
 }
 
 .deleteWedding {
@@ -94,8 +94,8 @@
   cursor: pointer;
 }
 .deleteWedding:hover {
-  color: var(--rose-dark);
-  border-color: var(--rose-dark);
+  color: var(--danger-ink);
+  border-color: var(--danger-ink);
 }
 
 .content {
@@ -330,8 +330,8 @@
 
 .editError {
   padding: 0.75rem;
-  background: var(--rose-soft);
-  color: var(--rose-dark);
+  background: var(--danger-soft);
+  color: var(--danger-ink);
   border-radius: 0.625rem;
 }
 
