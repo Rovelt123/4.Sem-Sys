@@ -6,6 +6,8 @@ import app.entities.Task;
 import app.mappers.generic.IMapper;
 
 import java.util.Set;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
 public class CategoryMapper implements IMapper<Category, CategoryDTO> {
@@ -24,7 +26,7 @@ public class CategoryMapper implements IMapper<Category, CategoryDTO> {
         if (dto.getTasks() != null) {
             Set<Task> tasks = dto.getTasks().stream()
                 .map(taskMapper::toEntity)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
             tasks.forEach(task -> task.setCategory(category));
 
@@ -47,10 +49,14 @@ public class CategoryMapper implements IMapper<Category, CategoryDTO> {
             )
             .position(entity.getPosition())
             .title(entity.getTitle())
+            .taskCount(entity.getTasks().size())
+            .completedTaskCount(entity.getTasks().stream().filter(Task::isCompleted).count())
+            .totalEstimatedHours(entity.getTasks().stream().mapToDouble(Task::getEstimatedHours).sum())
             .tasks(
                 entity.getTasks().stream()
+                .sorted(Comparator.comparingInt(Task::getPosition).thenComparing(Task::getId))
                 .map(taskMapper::toDTO)
-                .collect(Collectors.toSet())
+                .collect(Collectors.toCollection(LinkedHashSet::new))
             )
             .build();
     }

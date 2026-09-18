@@ -3,11 +3,14 @@ package app.mappers;
 import app.dtos.WeddingDTO;
 import app.entities.Category;
 import app.entities.Wedding;
+import app.entities.Task;
 import app.mappers.generic.IMapper;
 import app.utils.ErrorHandler;
 import app.enums.Notifications;
 
 import java.util.Set;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
 public class WeddingMapper implements IMapper<Wedding, WeddingDTO> {
@@ -32,7 +35,7 @@ public class WeddingMapper implements IMapper<Wedding, WeddingDTO> {
         if (dto.getCategories() != null) {
             Set<Category> categories = dto.getCategories().stream()
                 .map(categoryMapper::toEntity)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
             categories.forEach(category -> category.setWedding(wedding));
 
@@ -62,10 +65,14 @@ public class WeddingMapper implements IMapper<Wedding, WeddingDTO> {
             .location(entity.getLocation())
             .budget(entity.getBudget())
             .description(entity.getDescription())
+            .taskCount(entity.getCategories().stream().mapToInt(category -> category.getTasks().size()).sum())
+            .completedTaskCount(entity.getCategories().stream().flatMap(category -> category.getTasks().stream()).filter(Task::isCompleted).count())
+            .totalEstimatedHours(entity.getCategories().stream().flatMap(category -> category.getTasks().stream()).mapToDouble(Task::getEstimatedHours).sum())
             .categories(
                 entity.getCategories().stream()
+                .sorted(Comparator.comparingInt(Category::getPosition).thenComparing(Category::getId))
                 .map(categoryMapper::toDTO)
-                .collect(Collectors.toSet())
+                .collect(Collectors.toCollection(LinkedHashSet::new))
             )
             .build();
     }

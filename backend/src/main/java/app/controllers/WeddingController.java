@@ -3,7 +3,6 @@ package app.controllers;
 import app.controllers.generic.BaseController;
 import app.daos.WeddingDAO;
 import app.dtos.WeddingDTO;
-import app.entities.User;
 import app.entities.Wedding;
 import app.enums.Notifications;
 import app.enums.Role;
@@ -39,8 +38,10 @@ public class WeddingController extends BaseController<Wedding, WeddingDTO> {
     public static EndpointGroup registerRoutes() {
         WeddingController controller = new WeddingController();
         return () -> {
-            get("/weddings", controller::getAll, Role.USER);
-            get("/weddings/{id}", controller::getByID, Role.USER);
+            AdminController.registerRoutes().addEndpoints();
+
+            get("/weddings", controller::getMyWeddings, Role.USER);
+            get("/weddings/{id}", controller::getMyWeddingByID, Role.USER);
             post("/weddings", controller::createWedding, Role.USER);
             put("/weddings/{id}", controller::updateWedding, Role.USER);
             delete("/weddings/{id}", controller::deleteWedding, Role.USER);
@@ -63,11 +64,29 @@ public class WeddingController extends BaseController<Wedding, WeddingDTO> {
 
     // ________________________________________________________
 
-    private void createWedding(Context ctx) {
-
+    public void getMyWeddingByID(Context ctx) {
         Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
+        UUID weddingId = ErrorHandler.tryParseUUID(body.get("wedding_id"), Notifications.WEDDING_NOT_FOUND.getDisplayName());
 
-        Wedding wedding = weddingService.createWedding(userService.getOwnerId(ctx), body);
+        Wedding wedding = weddingDAO.getByIdAndOwnerId(userService.getOwnerId(ctx), weddingId);
+        WeddingDTO weddingDTO = weddingMapper.toDTO(wedding);
+        respond(ctx, 200, messageService.buildMessage(Notifications.GET_BY_ID, "wedding", body.get("wedding_id")), Map.of("data", weddingDTO));
+    }
+
+    // ________________________________________________________
+
+    public void getMyWeddings(Context ctx) {
+        List<Wedding> entities = weddingDAO.getAllByOwnerId(userService.getOwnerId(ctx));
+        List<WeddingDTO> weddings = entities.stream().map(weddingMapper::toDTO).toList();
+        respond(ctx, 200, messageService.buildMessage(Notifications.GET_ALL, String.valueOf(weddings.size()), "wedding"), Map.of("data", weddings));
+    }
+
+    // ________________________________________________________
+
+    public void createWedding(Context ctx) {
+
+
+        Wedding wedding = weddingService.createWedding(userService.getOwnerId(ctx), ctx);
         WeddingDTO dto = weddingMapper.toDTO(wedding);
 
         respond(ctx, 201, Notifications.WEDDING_CREATED.getDisplayName(), Map.of("data", dto));
@@ -75,11 +94,10 @@ public class WeddingController extends BaseController<Wedding, WeddingDTO> {
 
     // ________________________________________________________
 
-    private void updateWedding(Context ctx) {
+    public void updateWedding(Context ctx) {
         UUID id = ErrorHandler.tryParseUUID(ctx.pathParam("id"), Notifications.WEDDING_ID_INVALID.getDisplayName());
-        Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
 
-        Wedding wedding = weddingService.updateWedding(id, userService.getOwnerId(ctx), body);
+        Wedding wedding = weddingService.updateWedding(id, userService.getOwnerId(ctx), ctx);
         WeddingDTO dto = weddingMapper.toDTO(wedding);
 
         respond(ctx, 200, Notifications.WEDDING_UPDATED.getDisplayName(), Map.of("data", dto));
@@ -87,12 +105,11 @@ public class WeddingController extends BaseController<Wedding, WeddingDTO> {
 
     // ________________________________________________________
 
-    private void deleteWedding(Context ctx) {
+    public void deleteWedding(Context ctx) {
         UUID id = ErrorHandler.tryParseUUID(ctx.pathParam("id"), Notifications.WEDDING_ID_INVALID.getDisplayName());
 
         weddingService.deleteWedding(id, userService.getOwnerId(ctx));
 
         respond(ctx, 200, Notifications.WEDDING_DELETED.getDisplayName(), null);
     }
-
 }
