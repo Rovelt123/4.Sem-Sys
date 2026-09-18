@@ -4,7 +4,7 @@ import AuthStatusCard from '../../components/AuthStatusCard/AuthStatusCard'
 import Navbar from "../../components/Navbar/Navbar.jsx"
 import styles from './ConfirmEmailPage.module.css'
 
-const API_BASE = 'https://sys2.roneu.dk/api' ?? 'http://localhost:9292/api'
+const API_BASE = 'https://sys2.roneu.dk/api'
 
 // ________________________________________________________
 

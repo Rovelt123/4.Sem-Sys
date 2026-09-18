@@ -373,3 +373,154 @@
   border-radius: 0.625rem;
   background: var(--surface);
 }
+.summaryActions {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+
+    display: flex;
+    gap: 0.5rem;
+}
+
+.summaryActions .editWedding,
+.summaryActions .deleteWedding {
+    position: static;
+    top: auto;
+    right: auto;
+
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.09375rem;
+    text-transform: uppercase;
+}
+
+.addCategoryColumn {
+    min-height: 7rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+    border: 1px dashed var(--line);
+    border-radius: 1rem;
+
+    color: var(--ink-soft);
+    font-family: inherit;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.09375rem;
+    text-transform: uppercase;
+
+    cursor: pointer;
+}
+
+.addCategoryColumn:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+}
+
+.eyebrow {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.125rem;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+}
+
+.heading {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 3rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.1;
+}
+
+.summary {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    box-shadow: none;
+    padding: 1.5rem 0 2rem;
+}
+
+.date {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.125rem;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+}
+
+.weddingTitle {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 2.5rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+
+.venue {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--ink-soft);
+}
+
+.statValue {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 2rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+    font-size: 0.5625rem;
+    font-weight: 700;
+    letter-spacing: 0.09375rem;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.editModal h2,
+.editCategoryModal h2,
+.deleteModal h2 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 1.75rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.banner {
+    position: relative;
+    height: 11rem;
+    overflow: hidden;
+}
+
+.bannerImage {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 62%;
+    filter: saturate(0.78) contrast(0.96) brightness(1.03);
+}
+
+.banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(243, 238, 229, 0.12),
+        rgba(243, 238, 229, 0.92)
+    );
+}
+
+.homePage {
+    background: var(--bg);
+}

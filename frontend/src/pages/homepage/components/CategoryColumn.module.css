@@ -42,3 +42,80 @@
 .iconButton:hover {
   background: var(--accent-soft);
 }
+.empty {
+  margin: 0.75rem 0 0;
+
+  color: var(--ink-soft);
+  font-size: 0.8125rem;
+  font-style: italic;
+}
+
+.taskList {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+}
+
+.task {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  padding: 0.5rem 0;
+
+  border-top: 1px solid var(--line);
+}
+
+.taskTitle {
+  flex: 1;
+  min-width: 0;
+
+  color: var(--ink);
+  font-size: 0.875rem;
+}
+
+.taskMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  white-space: nowrap;
+}
+
+.priority {
+  color: var(--ink-soft);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.0625rem;
+}
+
+.price {
+  color: var(--accent-ink);
+  font-size: 0.75rem;
+}
+
+.container {
+  border-radius: 0;
+  border: none;
+  border-top: 1px solid var(--ink);
+  background: transparent;
+  padding: 1rem 0 0;
+}
+
+.smallTitle {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.09375rem;
+  text-transform: uppercase;
+}
+
+.taskTitle {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.125rem;
+}
+
+.empty {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1rem;
+}

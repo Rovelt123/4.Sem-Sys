@@ -182,3 +182,41 @@
   color: #536f5a;
   font-size: 0.88rem;
 }
+
+.confirmPage {
+  background: var(--bg);
+}
+
+.confirmSecondary {
+  color: var(--ink-soft);
+}
+
+.confirmSecondary a {
+  color: var(--ink);
+  border-bottom-color: var(--line);
+}
+
+.resendForm {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  box-shadow: none;
+}
+
+.resendForm label {
+  color: var(--ink);
+}
+
+.resendForm input {
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.resendForm input:focus {
+  border-color: var(--accent);
+}
+
+.resendForm button[type="submit"] {
+  background: var(--accent-ink);
+  border-radius: 999px;
+}
