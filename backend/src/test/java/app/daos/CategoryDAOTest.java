@@ -79,7 +79,7 @@ class CategoryDAOTest extends EntityManagerDAOTest<Category> {
 
         List<Category> found = categoryDAO.getAllByWeddingIdAndOwnerId(wedding.getId(),testUser.getId());
 
-        assertNotNull(found);
+        assertEquals(1, found.size());
         assertEquals("Catering", found.get(0).getTitle());
         assertEquals(wedding.getId(), found.get(0).getWedding().getId());
 
@@ -88,10 +88,11 @@ class CategoryDAOTest extends EntityManagerDAOTest<Category> {
     // ________________________________________________________
 
     @Test
-    void getAllByWeddingIdAndOwnerIdOnlyGetCategoriesForThisWedding() {
+    void getAllByWeddingIdAndOwnerIdOnlyGetCategoriesForRequestedWedding() {
 
-        categoryDAO.create(category);
-        categoryDAO.create(category2);
+
+        categoryDAO.create(category);  // category belongs to wedding, and is Catering
+        categoryDAO.create(category2); // category2 belongs to wedding2
 
         em.flush();
         em.clear();
@@ -100,6 +101,7 @@ class CategoryDAOTest extends EntityManagerDAOTest<Category> {
 
         assertEquals(1, found.size());
         assertEquals("Catering", found.get(0).getTitle());
+        // testUser have to weddings with CATERING, corret one have position 1, the wrong one have position 2
         assertEquals(1, found.get(0).getPosition());
 
     }
@@ -108,23 +110,6 @@ class CategoryDAOTest extends EntityManagerDAOTest<Category> {
 
     @Test
     void getByIdAndOwnerId() {
-        userDAO.create(testUser2);
-
-        categoryDAO.create(category);
-
-        em.flush();
-        em.clear();
-
-        Category found = categoryDAO.getByIdAndOwnerId(category.getId(), testUser2.getId());
-
-        assertNull(found);
-
-    }
-
-    // ________________________________________________________
-
-    @Test
-    void getByIdAndOwnerIdReturnNullWhenOwnerIsWrong() {
 
         Category category3 = Category.builder()
                 .title(Categories.DRINKS.getDisplayName())
@@ -141,8 +126,28 @@ class CategoryDAOTest extends EntityManagerDAOTest<Category> {
         Category found = categoryDAO.getByIdAndOwnerId(category3.getId(), testUser.getId());
 
         assertNotNull(found);
+        // Enum DRINKS -> "Alcohol & soft drinks"
         assertEquals("Alcohol & soft drinks", found.getTitle());
         assertEquals(wedding.getId(), found.getWedding().getId());
+
+    }
+
+    // ________________________________________________________
+
+    @Test
+    void getByIdAndOwnerIdReturnNullWhenOwnerIsWrong() {
+
+        userDAO.create(testUser2);
+
+        // category belongs to testUser´wedding not testUser2
+        categoryDAO.create(category);
+
+        em.flush();
+        em.clear();
+
+        Category found = categoryDAO.getByIdAndOwnerId(category.getId(), testUser2.getId());
+
+        assertNull(found);
 
     }
 
@@ -157,11 +162,63 @@ class CategoryDAOTest extends EntityManagerDAOTest<Category> {
                 .wedding(wedding)
                 .build();
 
-        categoryDAO.create(category);
+        categoryDAO.create(uncategorized);
 
         em.flush();
         em.clear();
 
+        Category found = categoryDAO.getUncategorized(wedding.getId(), testUser.getId());
+
+        assertNotNull(found);
+        assertEquals(Categories.UNCATEGORIZED.getDisplayName(), found.getTitle());
+
+    }
+
+    // ________________________________________________________
+
+    @Test
+    void getUncategorizedWrongWeddingID() {
+
+        Category uncategorized = Category.builder()
+                .title(Categories.UNCATEGORIZED.getDisplayName())
+                .position(3)
+                .wedding(wedding)
+                .build();
+
+        categoryDAO.create(uncategorized);
+
+        em.flush();
+        em.clear();
+
+        // using wrong weddingID from same owner
+        Category found = categoryDAO.getUncategorized(wedding2.getId(), testUser.getId());
+
+        assertNull(found);
+
+    }
+
+    // ________________________________________________________
+
+    @Test
+    void getUncategorizedWrongOwnerID() {
+
+        Category uncategorized = Category.builder()
+                .title(Categories.UNCATEGORIZED.getDisplayName())
+                .position(3)
+                .wedding(wedding)
+                .build();
+
+        categoryDAO.create(uncategorized);
+
+        userDAO.create(testUser2);
+
+        em.flush();
+        em.clear();
+
+        // using wrong owner for correct weddingId
+        Category found = categoryDAO.getUncategorized(wedding.getId(), testUser2.getId());
+
+        assertNull(found);
 
     }
 }

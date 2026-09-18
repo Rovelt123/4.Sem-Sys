@@ -76,6 +76,16 @@ public abstract class SetupTest {
         categoryDAO = new CategoryDAO(em);
         taskDAO = new TaskDAO(em);
 
+        setupUserTest();
+        setupWeddingTest();
+        setupCategoryTest();
+        setupTaskTest();
+    }
+
+    // ________________________________________________________
+
+    protected void setupUserTest(){
+
         testUser = User.builder()
                 .firstname("John")
                 .lastname("Doe")
@@ -91,6 +101,11 @@ public abstract class SetupTest {
                 .email("testuser2@test.dk")
                 .password("123")
                 .build();
+    }
+
+    // ________________________________________________________
+
+    protected void setupWeddingTest() {
 
         wedding = Wedding.builder()
                 .title("Our wedding")
@@ -107,31 +122,40 @@ public abstract class SetupTest {
                 .budget(weddingBudget)
                 .build();
         wedding2.setOwner(testUser);
+    }
 
-      category = Category.builder()
+    // ________________________________________________________
+
+    protected void setupCategoryTest() {
+
+        category = Category.builder()
                 .title(Categories.CATERING.getDisplayName())
                 .position(1)
                 .wedding(wedding)
                 .build();
 
-      category2 = Category.builder()
-              .title(Categories.CATERING.getDisplayName())
-              .position(2)
-              .wedding(wedding2)
-              .build();
+        category2 = Category.builder()
+                .title(Categories.CATERING.getDisplayName())
+                .position(2)
+                .wedding(wedding2)
+                .build();
+    }
 
-            task = Task.builder()
-                    .title("find catering company")
-                    .position(0)
-                    .category(category)
-                    .build();
+    // ________________________________________________________
 
-            task2 = Task.builder()
-                    .title("Decide menu")
-                    .position(1)
-                    .category(category)
-                    .build();
-        }
+    protected void setupTaskTest() {
+        task = Task.builder()
+                .title("find catering company")
+                .position(0)
+                .category(category)
+                .build();
+
+        task2 = Task.builder()
+                .title("Decide menu")
+                .position(1)
+                .category(category)
+                .build();
+    }
 
     // ________________________________________________________
 
