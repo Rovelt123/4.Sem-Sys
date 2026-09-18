@@ -74,7 +74,7 @@ public class CategoryController extends BaseController<Category, CategoryDTO> {
         Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
         UUID categoryId = ErrorHandler.tryParseUUID(body.get("category_id"), Notifications.CATEGORY_ID_INVALID.getDisplayName());
 
-        Category category = categoryDAO.getByIdAndOwnerId(userService.getOwnerId(ctx), categoryId);
+        Category category = categoryDAO.getByIdAndOwnerId(categoryId, userService.getOwnerId(ctx));
         CategoryDTO categoryDTO = categoryMapper.toDTO(category);
         respond(ctx, 200, messageService.buildMessage(Notifications.GET_BY_ID, "category", body.get("category_id")), Map.of("data", categoryDTO));
     }
