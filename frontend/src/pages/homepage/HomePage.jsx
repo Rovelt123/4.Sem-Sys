@@ -108,6 +108,11 @@ function HomePage() {
   const [showDeleteCategoryWarning, setShowDeleteCategoryWarning] = useState(false)
   
   
+  const [showCreateCategory, setShowCreateCategory] = useState(false)
+  const [createCategoryForm, setCreateCategoryForm] = useState({
+    title: '',
+  })
+  const [error, setError] = useState('')
 
   const done = tasks.filter((task) => task.done).length
   const percent = Math.round((done / tasks.length) * 100)
@@ -428,6 +433,60 @@ const handleEditCategory = async (e) => {
 
   // ________________________________________________________
 
+  const handleCreateCategory = async (e) => {
+    e.preventDefault()
+    setError('')
+
+
+    const body = {
+      title: createCategoryForm.title,
+      
+    }
+    try {
+      const response = await fetch(
+        `${API_BASE}/weddings/${wedding.id}/categories`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify(body),
+        }
+      )
+
+      if (!response.ok) {
+        const text = await response.text()
+        setEditError(parseErrorMessage(text) || 'Could not create the wedding')
+        return
+      }
+
+      const result = await response.json()
+
+      const createdCategory = result.data.data
+
+      setCategories([
+        ...categories,
+        createdCategory
+      ])
+
+      setCreateCategoryForm({
+        title: '',
+      })
+
+      setShowCreateCategory(false)
+
+    } catch {
+      setEditError('Could not connect to the server')
+    }
+  }
+
+  // ________________________________________________________
+
+  const handleCreateChangeCategory = (e) => {
+    setCreateCategoryForm({ ...createCategoryForm, [e.target.name]: e.target.value })
+  }
+
  
 
   return (
@@ -467,7 +526,7 @@ const handleEditCategory = async (e) => {
           <>
             <section className={styles.summary}>
               <button className={styles.editWedding} onClick={handleOpenEdit}> Edit </button>
-
+              <button className={styles.createCategoryButton} onClick={() => setShowCreateCategory(true)}> Category + </button>
               <div className={styles.summaryMain}>
                 <p className={styles.date}>
                   {new Date(wedding.date).toLocaleDateString('en-GB', {
@@ -629,6 +688,36 @@ const handleEditCategory = async (e) => {
               </div>
             </form>
 
+          </div>
+        )}
+
+        {showCreateCategory && (
+          <div className={styles.modalOverlay}>
+            <form className={styles.editCategoryModal} onSubmit={handleCreateCategory}>
+              <h2>Create category</h2>
+              {editError && (
+                <p className={styles.editError}> {editError} </p>
+              )}
+              <label htmlFor="category-title"> Title </label>
+              <input
+                id="category-title"
+                name="title"
+                type="text"
+                value={createCategoryForm.title}
+                onChange={handleCreateChangeCategory}
+                required
+              />
+
+              <div className={styles.modalActions}>
+                <button className={styles.deleteWedding} type="button" onClick={() => {setShowCreateCategory(false)}} >
+                  Cancel
+                </button>
+
+                <button className={styles.createWedding} type="submit">
+                  Create category
+                </button>
+              </div>
+            </form>
           </div>
         )}
 

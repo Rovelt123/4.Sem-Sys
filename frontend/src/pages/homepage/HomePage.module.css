@@ -129,6 +129,7 @@
   border: 1px solid var(--line);
   border-radius: 1.25rem;
   box-shadow: 0 1.125rem 2.5rem rgba(25, 29, 36, 0.05);
+  gap: 0.5rem;
 }
 
 .summaryMain {
@@ -267,6 +268,17 @@
   position: absolute;
   top: 1.5rem;
   right: 1.5rem;
+
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.createCategoryButton {
+  position: absolute;
+  top: 1.5rem;
+  right: 5.5rem;
 
   padding: 0.5rem 1rem;
   background: transparent;
