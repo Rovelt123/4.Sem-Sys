@@ -96,6 +96,18 @@ function HomePage() {
     title: '',
   })
 
+  const [taskToEdit, setTaskToEdit] = useState(null)
+  const [showEditTask, setShowEditTask] = useState(false)
+  const [editingTask, setEditingTask] = useState(false)
+  const [editTaskForm, setEditTaskForm] = useState({
+    title: '',
+    deadline: '',
+    price: '',
+    estimatedHours: '',
+    priority: 'LOW',
+    description: '',
+    link: '',
+  })
   const [taskToDelete, setTaskToDelete] = useState(null)
   const [showDeleteTaskWarning, setShowDeleteTaskWarning] = useState(false)
   const [showCreateTask, setShowCreateTask] = useState(false)
@@ -255,9 +267,7 @@ function HomePage() {
         description: editForm.description,
       }
 
-      if (editForm.budget !== '') {
-        body.budget = editForm.budget
-      }
+      body.budget = editForm.budget === '' ? '0' : editForm.budget
 
       try {
         const response = await fetch(
@@ -480,6 +490,91 @@ const handleEditCategory = async (e) => {
 
   // ________________________________________________________
 
+  const handleOpenEditTask = (task) => {
+    setTaskToEdit(task)
+
+    setEditTaskForm({
+      title: task.title ?? '',
+      deadline: task.deadline ?? '',
+      price: task.price != null ? String(task.price) : '',
+      estimatedHours: task.estimatedHours != null ? String(task.estimatedHours) : '',
+      priority: task.priority ?? 'LOW',
+      description: task.description ?? '',
+      link: task.link ?? '',
+    })
+
+    setEditError('')
+    setShowEditTask(true)
+  }
+
+  // ________________________________________________________
+
+  const handleEditChangeTask = (e) => {
+    setEditTaskForm({ ...editTaskForm, [e.target.name]: e.target.value })
+  }
+
+  // ________________________________________________________
+
+  const handleEditTask = async (e) => {
+    e.preventDefault()
+
+    setEditError('')
+    setEditingTask(true)
+
+    const body = {
+      title: editTaskForm.title,
+      deadline: editTaskForm.deadline,
+      price: editTaskForm.price === '' ? '0' : editTaskForm.price,
+      estimatedHours: editTaskForm.estimatedHours === '' ? '0' : editTaskForm.estimatedHours,
+      priority: editTaskForm.priority,
+      description: editTaskForm.description,
+      link: editTaskForm.link,
+    }
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/tasks/${taskToEdit.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify(body),
+        }
+      )
+
+      if (!response.ok) {
+        const text = await response.text()
+        setEditError(parseErrorMessage(text) || 'Could not update the task')
+        return
+      }
+
+      const result = await response.json()
+
+      const updatedTask = result.data.data
+
+      setCategories(
+        categories.map((category) => ({
+          ...category,
+          tasks: (category.tasks ?? []).map((task) =>
+            task.id === taskToEdit.id ? updatedTask : task
+          ),
+        }))
+      )
+
+      setShowEditTask(false)
+      setTaskToEdit(null)
+
+    } catch {
+      setEditError('Could not connect to the server')
+    } finally {
+      setEditingTask(false)
+    }
+  }
+
+  // ________________________________________________________
+
   const handleOpenDeleteTask = (task) => {
     setTaskToDelete(task)
     setShowDeleteTaskWarning(true)
@@ -560,9 +655,7 @@ const handleEditCategory = async (e) => {
       description: createTaskForm.description,
     }
 
-    if (createTaskForm.estimatedHours !== '') {
-      body.estimatedHours = createTaskForm.estimatedHours
-    }
+    body.estimatedHours = createTaskForm.estimatedHours === '' ? '0' : createTaskForm.estimatedHours
 
     try {
       const response = await fetch(
@@ -685,7 +778,7 @@ const handleEditCategory = async (e) => {
         {categories.map((category) => (
           <CategoryColumn
             key={category.id}
-            category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onDeleteTask={handleOpenDeleteTask}
+            category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onEditTask={handleOpenEditTask} onDeleteTask={handleOpenDeleteTask}
           />
         ))}
 
@@ -840,6 +933,53 @@ const handleEditCategory = async (e) => {
 
                 <button className={styles.createWedding} type="submit">
                   Create category
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {showEditTask && taskToEdit && (
+          <div className={styles.modalOverlay}>
+            <form className={styles.editCategoryModal} onSubmit={handleEditTask}>
+              <h2>Edit task</h2>
+
+              {editError && (
+                <p className={styles.editError}> {editError} </p>
+              )}
+
+              <label htmlFor="edit-task-title"> Title </label>
+              <input id="edit-task-title" name="title" type="text" value={editTaskForm.title} onChange={handleEditChangeTask} required />
+
+              <label htmlFor="edit-task-deadline"> Deadline </label>
+              <input id="edit-task-deadline" name="deadline" type="date" value={editTaskForm.deadline} onChange={handleEditChangeTask} required />
+
+              <label htmlFor="edit-task-price"> Price </label>
+              <input id="edit-task-price" name="price" type="number" min="0" step="1" value={editTaskForm.price} onChange={handleEditChangeTask} required />
+
+              <label htmlFor="edit-task-hours"> Estimated hours </label>
+              <input id="edit-task-hours" name="estimatedHours" type="number" min="0" step="0.5" value={editTaskForm.estimatedHours} onChange={handleEditChangeTask} required />
+
+              <label htmlFor="edit-task-priority"> Priority </label>
+              <select id="edit-task-priority" name="priority" value={editTaskForm.priority} onChange={handleEditChangeTask}>
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+              </select>
+
+              <label htmlFor="edit-task-link"> Link </label>
+              <input id="edit-task-link" name="link" type="url" value={editTaskForm.link} onChange={handleEditChangeTask} />
+
+              <label htmlFor="edit-task-description"> Description </label>
+              <textarea id="edit-task-description" name="description" rows="3" value={editTaskForm.description} onChange={handleEditChangeTask} />
+
+              <div className={styles.modalActions}>
+                <button className={styles.deleteWedding} type="button" onClick={() => {setShowEditTask(false), setTaskToEdit(null)}}>
+                  Cancel
+                </button>
+
+                <button className={styles.createWedding} type="submit" disabled={editingTask}>
+                  {editingTask ? 'Saving...' : 'Save changes'}
                 </button>
               </div>
             </form>
