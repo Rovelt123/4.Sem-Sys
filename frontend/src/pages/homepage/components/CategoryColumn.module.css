@@ -94,11 +94,25 @@
   gap: 0.75rem;
 }
 
+.taskCheckbox {
+  margin: 0.3125rem 0 0;
+
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 .taskTitle {
+  flex: 1;
+
   color: var(--ink);
   font-family: "Cormorant Garamond", Georgia, serif;
   font-size: 1.125rem;
   line-height: 1.2;
+}
+
+.taskDone .taskTitle {
+  color: var(--ink-soft);
+  text-decoration: line-through;
 }
 
 .taskMeta {
