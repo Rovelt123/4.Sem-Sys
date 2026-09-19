@@ -7,8 +7,6 @@ import { DndContext } from '@dnd-kit/core'
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
 
 
-
-
 // ________________________________________________________
 
 function displayName(user) {
