@@ -1,8 +1,15 @@
 package app;
 
 import app.configs.TestHibernateConfig;
+import app.daos.TaskDAO;
+import app.daos.CategoryDAO;
 import app.daos.UserDAO;
+import app.daos.WeddingDAO;
+import app.entities.Category;
+import app.entities.Task;
 import app.entities.User;
+import app.entities.Wedding;
+import app.enums.Categories;
 import app.enums.Role;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -12,6 +19,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -21,9 +29,26 @@ public abstract class SetupTest {
     protected EntityManager em;
 
     protected UserDAO userDAO;
+    protected WeddingDAO weddingDAO;
+    protected CategoryDAO categoryDAO;
+    protected TaskDAO taskDAO;
 
     protected User testUser;
     protected User testUser2;
+
+    protected Wedding wedding;
+    protected Wedding wedding2;
+
+    public LocalDate date = LocalDate.of(2026, 12, 24);
+    public LocalDate dateTwo = LocalDate.of(2026, 11, 11);
+
+    protected float weddingBudget = 100;
+
+    protected Category category;
+    protected Category category2;
+
+    protected Task task;
+    protected Task task2;
 
     // ________________________________________________________
 
@@ -47,6 +72,19 @@ public abstract class SetupTest {
         em.getTransaction().begin();
 
         userDAO = new UserDAO(em);
+        weddingDAO = new WeddingDAO(em);
+        categoryDAO = new CategoryDAO(em);
+        taskDAO = new TaskDAO(em);
+
+        setupUserTest();
+        setupWeddingTest();
+        setupCategoryTest();
+        setupTaskTest();
+    }
+
+    // ________________________________________________________
+
+    protected void setupUserTest(){
 
         testUser = User.builder()
                 .firstname("John")
@@ -62,6 +100,60 @@ public abstract class SetupTest {
                 .roles(Set.of(Role.USER))
                 .email("testuser2@test.dk")
                 .password("123")
+                .build();
+    }
+
+    // ________________________________________________________
+
+    protected void setupWeddingTest() {
+
+        wedding = Wedding.builder()
+                .title("Our wedding")
+                .date(date)
+                .location("Lyngby")
+                .budget(weddingBudget)
+                .build();
+        wedding.setOwner(testUser);
+
+        wedding2 = Wedding.builder()
+                .title("A wedding")
+                .date(dateTwo)
+                .location("Virum")
+                .budget(weddingBudget)
+                .build();
+        wedding2.setOwner(testUser);
+    }
+
+    // ________________________________________________________
+
+    protected void setupCategoryTest() {
+
+        category = Category.builder()
+                .title(Categories.CATERING.getDisplayName())
+                .position(1)
+                .wedding(wedding)
+                .build();
+
+        category2 = Category.builder()
+                .title(Categories.CATERING.getDisplayName())
+                .position(2)
+                .wedding(wedding2)
+                .build();
+    }
+
+    // ________________________________________________________
+
+    protected void setupTaskTest() {
+        task = Task.builder()
+                .title("find catering company")
+                .position(0)
+                .category(category)
+                .build();
+
+        task2 = Task.builder()
+                .title("Decide menu")
+                .position(1)
+                .category(category)
                 .build();
     }
 
