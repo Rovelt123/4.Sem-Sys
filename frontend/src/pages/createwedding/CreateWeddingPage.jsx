@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router'
 import { getToken } from '../../utils/storage'
 import styles from './CreateWeddingPage.module.css'
 
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
+const API_BASE = 'http://sys2.roneu.dk/api' ?? 'http://localhost:9292/api'
 
 // ________________________________________________________
 
