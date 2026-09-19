@@ -4,7 +4,7 @@ import styles from './HomePage.module.css'
 import CategoryColumn from './components/CategoryColumn.jsx'
 import {getToken, getUser, clearSession } from '../../utils/storage'
 import { DndContext } from '@dnd-kit/core'
-const API_BASE = 'http://sys2.roneu.dk/api' ?? 'http://localhost:9292/api'
+const API_BASE = 'https://sys2.roneu.dk/api' ?? 'http://localhost:9292/api'
 
 
 
