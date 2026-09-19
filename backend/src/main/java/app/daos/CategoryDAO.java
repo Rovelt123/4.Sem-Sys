@@ -32,7 +32,7 @@ public class CategoryDAO extends EntityManagerDAO<Category> {
     // ________________________________________________________
 
     public Category getByIdAndOwnerId(UUID id, UUID ownerId) {
-        String jpql = "SELECT c FROM Category c WHERE c.id = :id AND c.wedding.owner.id = :ownerId";
+        String jpql = "SELECT c FROM Category c WHERE c.id = :id AND wedding.owner.id = :ownerId";
 
         return executeQuery(() ->
             em.createQuery(jpql, Category.class)
@@ -95,7 +95,7 @@ public class CategoryDAO extends EntityManagerDAO<Category> {
                 .sorted(Comparator.comparingInt(Category::getPosition).thenComparing(Category::getId)).toList();
 
             updatePositions(remaining);
-            delete(category);
+
 
             return null;
         });

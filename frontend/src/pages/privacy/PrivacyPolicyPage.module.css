@@ -52,3 +52,16 @@
 .list li + li {
     margin-top: 0.5rem;
 }
+
+.title {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.heading {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+}

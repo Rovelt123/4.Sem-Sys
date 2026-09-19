@@ -49,4 +49,8 @@ public class Wedding {
         categories.add(category);
         category.setWedding(this);
     }
+
+    public void removeCategory(Category category) {
+        categories.remove(category);
+    }
 }
