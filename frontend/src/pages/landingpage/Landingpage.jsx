@@ -1,5 +1,5 @@
 import styles from "./Landingpage.module.css";
-import Navbar from "./components/Navbar";
+import Navbar from "../../components/Navbar/Navbar.jsx"
 import LandingpageSection from "./components/Landingpage-section";
 function Landingpage(){
 

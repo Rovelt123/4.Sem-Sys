@@ -1,0 +1,222 @@
+.confirmPage {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+
+  background: #f6f2ef;
+}
+
+.confirmContent {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  box-sizing: border-box;
+}
+
+.confirmDecor {
+  position: absolute;
+
+  width: 620px;
+  height: 620px;
+
+  top: -270px;
+  right: -190px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(183, 161, 151, 0.16) 0%,
+      rgba(183, 161, 151, 0) 70%
+    );
+
+  pointer-events: none;
+}
+
+.confirmWordmark {
+  position: absolute;
+
+  top: 34px;
+  left: 42px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  color: #302a27;
+  text-decoration: none;
+
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.confirmWordmark img {
+  width: 34px;
+  height: 34px;
+}
+
+.confirmWordmark em {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+}
+
+.confirmSecondary {
+  margin: 24px 0 0;
+
+  position: relative;
+  z-index: 1;
+
+  color: #807773;
+
+  font-size: 0.9rem;
+}
+
+.confirmSecondary a {
+  color: #4e4541;
+
+  font-weight: 500;
+  text-decoration: none;
+
+  border-bottom: 1px solid rgba(78, 69, 65, 0.35);
+}
+
+.confirmSecondary a:hover {
+  border-bottom-color: #4e4541;
+}
+
+.resendLink {
+  background: none;
+  border: none;
+  padding: 0;
+
+  color: #4e4541;
+
+  font: inherit;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  border-bottom: 1px solid rgba(78, 69, 65, 0.35);
+}
+
+.resendLink:hover {
+  border-bottom-color: #4e4541;
+}
+
+.resendForm {
+  width: min(100% - 32px, 460px);
+
+  margin-top: 24px;
+  padding: 28px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  background: #ffffff;
+  border-radius: 20px;
+
+  box-shadow:
+    0 20px 60px rgba(40, 28, 24, 0.06),
+    0 2px 8px rgba(40, 28, 24, 0.04);
+}
+
+.resendForm label {
+  color: #4e4541;
+
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.resendForm input {
+  width: 100%;
+
+  padding: 14px 16px;
+
+  border: 1px solid #ddd4d0;
+  border-radius: 10px;
+
+  font-size: 0.95rem;
+}
+
+.resendForm input:focus {
+  outline: none;
+  border-color: #9b8980;
+}
+
+.resendForm button[type="submit"] {
+  padding: 14px 18px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #4e4541;
+
+  color: white;
+
+  font-size: 0.95rem;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.resendForm button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.resendError {
+  color: #a15d58;
+  font-size: 0.88rem;
+}
+
+.resendSuccess {
+  color: #536f5a;
+  font-size: 0.88rem;
+}
+
+.confirmPage {
+  background: var(--bg);
+}
+
+.confirmSecondary {
+  color: var(--ink-soft);
+}
+
+.confirmSecondary a {
+  color: var(--ink);
+  border-bottom-color: var(--line);
+}
+
+.resendForm {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  box-shadow: none;
+}
+
+.resendForm label {
+  color: var(--ink);
+}
+
+.resendForm input {
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.resendForm input:focus {
+  border-color: var(--accent);
+}
+
+.resendForm button[type="submit"] {
+  background: var(--accent-ink);
+  border-radius: 999px;
+}

@@ -95,7 +95,7 @@ public class CategoryDAO extends EntityManagerDAO<Category> {
                 .sorted(Comparator.comparingInt(Category::getPosition).thenComparing(Category::getId)).toList();
 
             updatePositions(remaining);
-            delete(category);
+
 
             return null;
         });

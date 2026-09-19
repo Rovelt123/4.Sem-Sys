@@ -1,25 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import styles from './HomePage.module.css'
-import TaskList from './components/TaskList.jsx'
+import CategoryColumn from './components/CategoryColumn.jsx'
 import {getToken, getUser, clearSession } from '../../utils/storage'
+import { DndContext } from '@dnd-kit/core'
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:9292/api'
 
-const PLACEHOLDER_WEDDING = {
-  title: 'Our wedding',
-  date: '2027-06-12',
-  venue: 'Kokkedal Slot',
-  guests: 84,
-}
-
-const PLACEHOLDER_TASKS = [
-  { id: 1, title: 'Book the venue', category: 'Venue', due: '2026-10-01', priority: 'High', done: true },
-  { id: 2, title: 'Send save the date', category: 'Guests', due: '2026-11-15', priority: 'High', done: true },
-  { id: 3, title: 'Find a photographer', category: 'Vendors', due: '2027-02-01', priority: 'High', done: false },
-  { id: 4, title: 'Choose the menu', category: 'Catering', due: '2027-01-20', priority: 'Medium', done: false },
-  { id: 5, title: 'Order the cake', category: 'Catering', due: '2027-03-10', priority: 'Medium', done: false },
-  { id: 6, title: 'Plan the seating', category: 'Guests', due: '2027-05-01', priority: 'Low', done: false },
-]
 
 
 
@@ -79,7 +65,6 @@ function HomePage() {
 
   const [showDeleteWarning, setShowDeleteWarning] = useState(false)
 
-  const [tasks, setTasks] = useState(PLACEHOLDER_TASKS)
   const navigate = useNavigate()
 
   const [showEditWedding, setShowEditWedding] = useState(false)
@@ -91,12 +76,57 @@ function HomePage() {
     budget: '',
     description: '',
   })
+
+ 
   const [editError, setEditError] = useState('')
   const [editingWedding, setEditingWedding] = useState(false)
-  
 
-  const done = tasks.filter((task) => task.done).length
-  const percent = Math.round((done / tasks.length) * 100)
+  const [categories, setCategories] = useState([])
+
+  const [editFormCategory, setEditFormCategory] = useState({
+    title: '',
+  })
+  const [showEditCategory, setShowEditCategory] = useState(false)
+  const [editingCategory, setEditingCategory] = useState(null)
+  const [categoryToDelete, setCategoryToDelete] = useState(null)
+  const [showDeleteCategoryWarning, setShowDeleteCategoryWarning] = useState(false)
+  
+  
+  const [showCreateCategory, setShowCreateCategory] = useState(false)
+  const [createCategoryForm, setCreateCategoryForm] = useState({
+    title: '',
+  })
+
+  const [taskToEdit, setTaskToEdit] = useState(null)
+  const [showEditTask, setShowEditTask] = useState(false)
+  const [editingTask, setEditingTask] = useState(false)
+  const [editTaskForm, setEditTaskForm] = useState({
+    title: '',
+    deadline: '',
+    price: '',
+    estimatedHours: '',
+    priority: 'LOW',
+    description: '',
+    link: '',
+  })
+  const [taskToDelete, setTaskToDelete] = useState(null)
+  const [showDeleteTaskWarning, setShowDeleteTaskWarning] = useState(false)
+  const [showCreateTask, setShowCreateTask] = useState(false)
+  const [createTaskCategory, setCreateTaskCategory] = useState(null)
+  const [creatingTask, setCreatingTask] = useState(false)
+  const [createTaskForm, setCreateTaskForm] = useState({
+    title: '',
+    deadline: '',
+    price: '',
+    estimatedHours: '',
+    priority: 'LOW',
+    description: '',
+  })
+
+  const taskCount = categories.reduce(
+    (total, category) => total + (category.tasks?.length ?? 0),
+    0
+  )
   const days = wedding ? daysUntil(wedding.date) : 0
     // ________________________________________________________
 
@@ -144,15 +174,47 @@ function HomePage() {
 
   }, [])
 
+  useEffect(() => {
+  if (!wedding) {
+    return
+  }
+
+  const loadCategories = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/weddings/${wedding.id}/categories`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Could not load categories')
+      }
+
+      const result = await response.json()
+      const categories = result.data.data
+
+      console.log('Category response:', result)
+      console.log('Categories:', categories)
+
+      setCategories(categories)
+
+    } catch (error) {
+      console.error('Could not load categories:', error)
+      setCategories([])
+    }
+  }
+
+  loadCategories()
+}, [wedding])
+
+
 
 
   // ________________________________________________________
-  const toggleTask = (id) => {
-    setTasks(tasks.map((task) =>
-      task.id === id ? { ...task, done: !task.done } : task
-    ))
-  }
-
   // ________________________________________________________
 
   const handleLogout = () => {
@@ -206,9 +268,7 @@ function HomePage() {
         description: editForm.description,
       }
 
-      if (editForm.budget !== '') {
-        body.budget = editForm.budget
-      }
+      body.budget = editForm.budget === '' ? '0' : editForm.budget
 
       try {
         const response = await fetch(
@@ -267,6 +327,473 @@ function HomePage() {
 
   // ________________________________________________________
 
+  const handleEditChangeCategory = (e) => {
+      setEditFormCategory({...editFormCategory, [e.target.name]: e.target.value,})
+    }
+
+  // ________________________________________________________
+
+   const handleOpenEditCategory = (category) => {
+      setEditingCategory(category)
+      setEditFormCategory({
+        title: category.title ?? '',
+      })
+      setEditError('')
+      setShowEditCategory(true)
+    }
+
+// ________________________________________________________
+
+    const handleOpenDeleteCategory = (category) => {
+      setCategoryToDelete(category)
+      setShowDeleteCategoryWarning(true)
+    }
+
+// ________________________________________________________
+
+const handleEditCategory = async (e) => {
+      e.preventDefault()
+
+      setEditError('')
+      
+
+      const body = {
+        title: editFormCategory.title,
+      }
+
+      try {
+        const response = await fetch(
+          `${API_BASE}/categories/${editingCategory.id}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify(body),
+          }
+        )
+
+        if (!response.ok) {
+          const text = await response.text()
+          setEditError(
+            parseErrorMessage(text) || 'Could not update category'
+          )
+          return
+        }
+
+        setCategories(
+          categories.map((category) =>
+            category.id === editingCategory.id
+              ? { ...category, ...body }
+              : category
+          )
+        )
+
+        setShowEditCategory(false)
+
+      } catch {
+        setEditError('Could not connect to the server')
+      } finally {
+        setEditingCategory(false)
+      }
+    }
+
+  // ________________________________________________________
+
+  const handleDeleteCategory = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/categories/${categoryToDelete.id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
+
+      if (!response.ok) {
+        const text = await response.text()
+        console.log('DELETE error response:', text)
+        throw new Error('Could not delete category')
+      }
+
+      setCategories(
+        categories.filter(
+          category => category.id !== categoryToDelete.id
+        )
+      )
+
+      setCategoryToDelete(null)
+      setShowDeleteCategoryWarning(false)
+
+    } catch (error) {
+      console.error('Could not delete category:', error)
+    }
+  }
+  
+
+  // ________________________________________________________
+
+  const handleCreateCategory = async (e) => {
+    e.preventDefault()
+
+
+    const body = {
+      title: createCategoryForm.title,
+      
+    }
+    try {
+      const response = await fetch(
+        `${API_BASE}/weddings/${wedding.id}/categories`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify(body),
+        }
+      )
+
+      if (!response.ok) {
+        const text = await response.text()
+        setEditError(parseErrorMessage(text) || 'Could not create the wedding')
+        return
+      }
+
+      const result = await response.json()
+
+      const createdCategory = result.data.data
+
+      setCategories([
+        ...categories,
+        createdCategory
+      ])
+
+      setCreateCategoryForm({
+        title: '',
+      })
+
+      setShowCreateCategory(false)
+
+    } catch {
+      setEditError('Could not connect to the server')
+    }
+  }
+
+  // ________________________________________________________
+
+  const handleCreateChangeCategory = (e) => {
+    setCreateCategoryForm({ ...createCategoryForm, [e.target.name]: e.target.value })
+  }
+
+  // ________________________________________________________
+
+  const handleOpenEditTask = (task) => {
+    setTaskToEdit(task)
+
+    setEditTaskForm({
+      title: task.title ?? '',
+      deadline: task.deadline ?? '',
+      price: task.price != null ? String(task.price) : '',
+      estimatedHours: task.estimatedHours != null ? String(task.estimatedHours) : '',
+      priority: task.priority ?? 'LOW',
+      description: task.description ?? '',
+      link: task.link ?? '',
+    })
+
+    setEditError('')
+    setShowEditTask(true)
+  }
+
+  // ________________________________________________________
+
+  const handleEditChangeTask = (e) => {
+    setEditTaskForm({ ...editTaskForm, [e.target.name]: e.target.value })
+  }
+
+  // ________________________________________________________
+
+  const handleEditTask = async (e) => {
+    e.preventDefault()
+
+    setEditError('')
+    setEditingTask(true)
+
+    const body = {
+      title: editTaskForm.title,
+      deadline: editTaskForm.deadline,
+      price: editTaskForm.price === '' ? '0' : editTaskForm.price,
+      estimatedHours: editTaskForm.estimatedHours === '' ? '0' : editTaskForm.estimatedHours,
+      priority: editTaskForm.priority,
+      description: editTaskForm.description,
+      link: editTaskForm.link,
+    }
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/tasks/${taskToEdit.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify(body),
+        }
+      )
+
+      if (!response.ok) {
+        const text = await response.text()
+        setEditError(parseErrorMessage(text) || 'Could not update the task')
+        return
+      }
+
+      const result = await response.json()
+
+      const updatedTask = result.data.data
+
+      setCategories(
+        categories.map((category) => ({
+          ...category,
+          tasks: (category.tasks ?? []).map((task) =>
+            task.id === taskToEdit.id ? updatedTask : task
+          ),
+        }))
+      )
+
+      setShowEditTask(false)
+      setTaskToEdit(null)
+
+    } catch {
+      setEditError('Could not connect to the server')
+    } finally {
+      setEditingTask(false)
+    }
+  }
+
+  // ________________________________________________________
+
+  const handleOpenDeleteTask = (task) => {
+    setTaskToDelete(task)
+    setShowDeleteTaskWarning(true)
+  }
+
+  // ________________________________________________________
+
+  const handleDeleteTask = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/tasks/${taskToDelete.id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Could not delete task')
+      }
+
+      setCategories(
+        categories.map((category) => ({
+          ...category,
+          tasks: (category.tasks ?? []).filter(
+            (task) => task.id !== taskToDelete.id
+          ),
+        }))
+      )
+
+      setTaskToDelete(null)
+      setShowDeleteTaskWarning(false)
+
+    } catch (error) {
+      console.error('Could not delete task:', error)
+    }
+  }
+
+  // ________________________________________________________
+
+  const handleOpenCreateTask = (category) => {
+    setCreateTaskCategory(category)
+
+    setCreateTaskForm({
+      title: '',
+      deadline: '',
+      price: '',
+      estimatedHours: '',
+      priority: 'LOW',
+      description: '',
+    })
+
+    setEditError('')
+    setShowCreateTask(true)
+  }
+
+  // ________________________________________________________
+
+  const handleCreateChangeTask = (e) => {
+    setCreateTaskForm({ ...createTaskForm, [e.target.name]: e.target.value })
+  }
+
+  // ________________________________________________________
+
+  const handleCreateTask = async (e) => {
+    e.preventDefault()
+
+    setEditError('')
+    setCreatingTask(true)
+
+    const body = {
+      title: createTaskForm.title,
+      deadline: createTaskForm.deadline,
+      price: createTaskForm.price,
+      priority: createTaskForm.priority,
+      description: createTaskForm.description,
+    }
+
+    body.estimatedHours = createTaskForm.estimatedHours === '' ? '0' : createTaskForm.estimatedHours
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/categories/${createTaskCategory.id}/tasks`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify(body),
+        }
+      )
+
+      if (!response.ok) {
+        const text = await response.text()
+        setEditError(parseErrorMessage(text) || 'Could not create the task')
+        return
+      }
+
+      const result = await response.json()
+
+      const createdTask = result.data.data
+
+      setCategories(
+        categories.map((category) =>
+          category.id === createTaskCategory.id
+            ? { ...category, tasks: [...(category.tasks ?? []), createdTask] }
+            : category
+        )
+      )
+
+      setShowCreateTask(false)
+      setCreateTaskCategory(null)
+
+    } catch {
+      setEditError('Could not connect to the server')
+    } finally {
+      setCreatingTask(false)
+    }
+  }
+
+  // ________________________________________________________
+
+  const moveTaskToCategory = async (task, targetCategory) => {
+    const body = {
+      categoryId: targetCategory.id,
+      position: String(targetCategory.tasks?.length ?? 0),
+    }
+    const sourceCategoryId = task.categoryId
+    const targetCategoryId = targetCategory.id
+
+    if (sourceCategoryId === targetCategoryId) {
+          return
+      }
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/tasks/${task.id}/position`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify(body),
+        }
+      )
+
+      if (!response.ok) {
+        const text = await response.text()
+        setEditError(parseErrorMessage(text) || 'could not move task')
+        return
+      }
+      const result = await response.json()
+      const updatedTask = result.data.data
+
+      setCategories(categories.map((category) => {
+        if (category.id === sourceCategoryId) {
+          return {
+            ...category,
+            tasks: (category.tasks ?? []).filter(
+              (currentTask) => currentTask.id !== task.id
+            ),
+          }
+        }
+
+        if (category.id === targetCategoryId) {
+          return {
+            ...category,
+            tasks: [
+              ...(category.tasks ?? []),
+              updatedTask,
+            ],
+          }
+        }
+
+       return category
+      })
+    )
+    } catch {
+      setEditError('Could not move task')
+    }
+
+  }
+
+  // ________________________________________________________
+
+  const handleDragEnd = ({ active, over }) => {
+    if (!over) {
+      return
+    }
+
+    let draggedTask = null
+
+    for (const category of categories) {
+      const foundTask = (category.tasks ?? []).find(
+        (task) => task.id === active.id
+      )
+
+      if (foundTask) {
+        draggedTask = foundTask
+        break
+      }
+    }
+
+    const targetCategory = categories.find(
+      (category) => category.id === over.id
+    )
+
+    if (!draggedTask || !targetCategory) {
+      return
+    }
+
+    moveTaskToCategory(draggedTask, targetCategory)
+  }
+
   return (
     <div className={styles.homePage}>
       <header className={styles.topBar}>
@@ -278,10 +805,13 @@ function HomePage() {
         <div className={styles.account}>
           <span className={styles.accountName}>{name}</span>
           {!loadingWedding && !wedding && (<button className={styles.createWedding} onClick={handleCreateWedding}>Create wedding</button>)}
-          {!loadingWedding && wedding && (<button className={styles.deleteWedding} onClick={() => setShowDeleteWarning(true)}>Delete wedding</button>)}
           <button className={styles.logout} onClick={handleLogout}>Log out</button>
         </div>
       </header>
+
+      <div className={styles.banner}>
+        <img className={styles.bannerImage} src="/hero.jpg" alt="" />
+      </div>
 
       <main className={styles.content}>
         <p className={styles.eyebrow}>Your planning</p>
@@ -303,8 +833,10 @@ function HomePage() {
         {!loadingWedding && wedding && (
           <>
             <section className={styles.summary}>
-              <button className={styles.editWedding} onClick={handleOpenEdit}> Edit </button>
-
+              <div className={styles.summaryActions}>
+                <button className={styles.editWedding} onClick={handleOpenEdit}> Edit </button>
+                <button className={styles.deleteWedding} onClick={() => setShowDeleteWarning(true)}> Delete wedding </button>
+              </div>
               <div className={styles.summaryMain}>
                 <p className={styles.date}>
                   {new Date(wedding.date).toLocaleDateString('en-GB', {
@@ -327,26 +859,31 @@ function HomePage() {
                 </div>
 
                 <div className={styles.stat}>
-                  <span className={styles.statValue}> {percent}% </span>
-                  <span className={styles.statLabel}> done </span>
+                  <span className={styles.statValue}> {taskCount} </span>
+                  <span className={styles.statLabel}> tasks </span>
                 </div>
-              </div>
-
-              <div className={styles.progress}>
-                <div className={styles.bar} style={{ width: percent + '%' }} />
               </div>
             </section>
 
-            <div className={styles.sectionHead}>
-              <h2 className={styles.sectionTitle}> Tasks </h2>
-
-              <span className={styles.sectionCount}> {done} of {tasks.length} done </span>
-            </div>
-
-            <TaskList tasks={tasks} onToggle={toggleTask} />
+            
           </>
         )}
+      <DndContext onDragEnd={handleDragEnd}>
+        <div className={styles.categoryBoard}>
+          {categories.map((category) => (
+            <CategoryColumn
+              key={category.id}
+              category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onEditTask={handleOpenEditTask} onDeleteTask={handleOpenDeleteTask}
+            />
+          ))}
 
+          {wedding && (
+            <button className={styles.addCategoryColumn} onClick={() => setShowCreateCategory(true)}>
+              + New category
+            </button>
+          )}
+        </div>
+      </DndContext>
       </main>
 
       <footer className={styles.footer}>
@@ -416,6 +953,191 @@ function HomePage() {
               </div>
             </form>
 
+          </div>
+        )}
+
+        {showDeleteCategoryWarning && categoryToDelete && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.deleteModal}>
+            <h2>Delete category?</h2>
+
+            <p> Are you sure you want to delete this Category?</p>
+
+            <div className={styles.modalActions}>
+              <button className={styles.deleteWedding} onClick={() => {setShowDeleteCategoryWarning(false), setCategoryToDelete(null)}}>Cancel</button>
+              <button className={styles.deleteWedding} onClick={handleDeleteCategory}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+        {showEditCategory && (
+          <div className={styles.modalOverlay}>
+
+            <form className={styles.editCategoryModal} onSubmit={handleEditCategory}>
+              <h2>Edit category</h2>
+              {editError && (
+                <p className={styles.editError}> {editError} </p>
+              )}
+
+              <label htmlFor="category-title"> Category name </label>
+
+              <input
+                id="category-title"
+                name="title"
+                type="text"
+                value={editFormCategory.title}
+                onChange={handleEditChangeCategory}
+                required
+              />
+
+              <div className={styles.modalActions}>
+                <button className={styles.deleteWedding} type="button" onClick={() => {setShowEditCategory(false), setEditingCategory(null)}} >
+                  Cancel
+                </button>
+
+                <button className={styles.createWedding} type="submit">
+                  Save changes
+                </button>
+              </div>
+            </form>
+
+          </div>
+        )}
+
+        {showCreateCategory && (
+          <div className={styles.modalOverlay}>
+            <form className={styles.editCategoryModal} onSubmit={handleCreateCategory}>
+              <h2>Create category</h2>
+              {editError && (
+                <p className={styles.editError}> {editError} </p>
+              )}
+              <label htmlFor="category-title"> Title </label>
+              <input
+                id="category-title"
+                name="title"
+                type="text"
+                value={createCategoryForm.title}
+                onChange={handleCreateChangeCategory}
+                required
+              />
+
+              <div className={styles.modalActions}>
+                <button className={styles.deleteWedding} type="button" onClick={() => {setShowCreateCategory(false)}} >
+                  Cancel
+                </button>
+
+                <button className={styles.createWedding} type="submit">
+                  Create category
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {showEditTask && taskToEdit && (
+          <div className={styles.modalOverlay}>
+            <form className={styles.editCategoryModal} onSubmit={handleEditTask}>
+              <h2>Edit task</h2>
+
+              {editError && (
+                <p className={styles.editError}> {editError} </p>
+              )}
+
+              <label htmlFor="edit-task-title"> Title </label>
+              <input id="edit-task-title" name="title" type="text" value={editTaskForm.title} onChange={handleEditChangeTask} required />
+
+              <label htmlFor="edit-task-deadline"> Deadline </label>
+              <input id="edit-task-deadline" name="deadline" type="date" value={editTaskForm.deadline} onChange={handleEditChangeTask} required />
+
+              <label htmlFor="edit-task-price"> Price </label>
+              <input id="edit-task-price" name="price" type="number" min="0" step="1" value={editTaskForm.price} onChange={handleEditChangeTask} required />
+
+              <label htmlFor="edit-task-hours"> Estimated hours </label>
+              <input id="edit-task-hours" name="estimatedHours" type="number" min="0" step="0.5" value={editTaskForm.estimatedHours} onChange={handleEditChangeTask} required />
+
+              <label htmlFor="edit-task-priority"> Priority </label>
+              <select id="edit-task-priority" name="priority" value={editTaskForm.priority} onChange={handleEditChangeTask}>
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+              </select>
+
+              <label htmlFor="edit-task-link"> Link </label>
+              <input id="edit-task-link" name="link" type="url" value={editTaskForm.link} onChange={handleEditChangeTask} />
+
+              <label htmlFor="edit-task-description"> Description </label>
+              <textarea id="edit-task-description" name="description" rows="3" value={editTaskForm.description} onChange={handleEditChangeTask} />
+
+              <div className={styles.modalActions}>
+                <button className={styles.deleteWedding} type="button" onClick={() => {setShowEditTask(false), setTaskToEdit(null)}}>
+                  Cancel
+                </button>
+
+                <button className={styles.createWedding} type="submit" disabled={editingTask}>
+                  {editingTask ? 'Saving...' : 'Save changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {showDeleteTaskWarning && taskToDelete && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.deleteModal}>
+              <h2>Delete task?</h2>
+
+              <p> Are you sure you want to delete {taskToDelete.title}?</p>
+
+              <div className={styles.modalActions}>
+                <button className={styles.deleteWedding} onClick={() => {setShowDeleteTaskWarning(false), setTaskToDelete(null)}}>Cancel</button>
+                <button className={styles.deleteWedding} onClick={handleDeleteTask}>Delete</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showCreateTask && createTaskCategory && (
+          <div className={styles.modalOverlay}>
+            <form className={styles.editCategoryModal} onSubmit={handleCreateTask}>
+              <h2>Create task</h2>
+
+              {editError && (
+                <p className={styles.editError}> {editError} </p>
+              )}
+
+              <label htmlFor="task-title"> Title </label>
+              <input id="task-title" name="title" type="text" value={createTaskForm.title} onChange={handleCreateChangeTask} required />
+
+              <label htmlFor="task-deadline"> Deadline </label>
+              <input id="task-deadline" name="deadline" type="date" value={createTaskForm.deadline} onChange={handleCreateChangeTask} required />
+
+              <label htmlFor="task-price"> Price </label>
+              <input id="task-price" name="price" type="number" min="0" step="1" value={createTaskForm.price} onChange={handleCreateChangeTask} required />
+
+              <label htmlFor="task-hours"> Estimated hours </label>
+              <input id="task-hours" name="estimatedHours" type="number" min="0" step="0.5" value={createTaskForm.estimatedHours} onChange={handleCreateChangeTask} />
+
+              <label htmlFor="task-priority"> Priority </label>
+              <select id="task-priority" name="priority" value={createTaskForm.priority} onChange={handleCreateChangeTask}>
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+              </select>
+
+              <label htmlFor="task-description"> Description </label>
+              <textarea id="task-description" name="description" rows="3" value={createTaskForm.description} onChange={handleCreateChangeTask} />
+
+              <div className={styles.modalActions}>
+                <button className={styles.deleteWedding} type="button" onClick={() => {setShowCreateTask(false), setCreateTaskCategory(null)}}>
+                  Cancel
+                </button>
+
+                <button className={styles.createWedding} type="submit" disabled={creatingTask}>
+                  {creatingTask ? 'Creating...' : 'Create task'}
+                </button>
+              </div>
+            </form>
           </div>
         )}
 
