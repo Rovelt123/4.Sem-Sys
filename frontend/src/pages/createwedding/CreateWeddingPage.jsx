@@ -56,9 +56,7 @@ function CreateWeddingPage() {
       description: form.description,
     }
 
-    if (form.budget !== '') {
-      body.budget = form.budget
-    }
+    body.budget = form.budget === '' ? '0' : form.budget
 
     try {
       const response = await fetch(`${API_BASE}/weddings`, {

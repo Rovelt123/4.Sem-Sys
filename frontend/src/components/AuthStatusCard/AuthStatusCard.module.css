@@ -91,3 +91,30 @@
     transform: rotate(360deg);
   }
 }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  box-shadow: none;
+}
+
+.card h1 {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.card p {
+  color: var(--ink-soft);
+}
+
+.description {
+  color: var(--ink-soft) !important;
+}
+
+.loading {
+  background: var(--accent-soft);
+}

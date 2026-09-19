@@ -8,6 +8,10 @@
   --accent-soft: #ece5d8;
   --accent-ink: #6d5f4b;
 
+  --danger: #c15b6a;
+  --danger-ink: #8a3f4b;
+  --danger-soft: #f7e4e7;
+
   font-family: "Work Sans", -apple-system, "Segoe UI", sans-serif;
   line-height: 1.5;
   color: var(--ink);
