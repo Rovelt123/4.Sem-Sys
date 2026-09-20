@@ -1,6 +1,7 @@
 import styles from './CategoryColumn.module.css'
 import DraggableTask from './DraggableTask'
 import { useDroppable } from '@dnd-kit/core'
+import {SortableContext, verticalListSortingStrategy,} from '@dnd-kit/sortable'
 
 function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onDeleteTask, onToggleTask }) {
 
@@ -55,8 +56,9 @@ function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onD
                 <p className={styles.empty}>No tasks yet</p>
             )}
 
-            <ul className={styles.taskList}>
-                {tasks.map((task) => (
+            <SortableContext items={tasks.map((task) => task.id)} strategy={verticalListSortingStrategy}>
+                <ul className={styles.taskList}>
+                    {tasks.map((task) => (
                     <DraggableTask
                         key={task.id}
                         task={task}
@@ -64,8 +66,9 @@ function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onD
                         onDeleteTask={onDeleteTask}
                         onToggleTask={onToggleTask}
                     />
-                ))}
-            </ul>
+                    ))}
+                </ul>
+            </SortableContext>
         </div>
     )
 }

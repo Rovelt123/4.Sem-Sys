@@ -756,67 +756,121 @@ const handleEditCategory = async (e) => {
 
   // ________________________________________________________
 
-  const moveTaskToCategory = async (task, targetCategory) => {
-    const body = {
-      categoryId: targetCategory.id,
-      position: String(targetCategory.tasks?.length ?? 0),
-    }
-    const sourceCategoryId = task.categoryId
-    const targetCategoryId = targetCategory.id
+  const findCategoryByTaskId = (taskId) => {
+    return categories.find((category) =>
+      (category.tasks ?? []).some((task) => task.id === taskId)
+    )
+  }
 
-    if (sourceCategoryId === targetCategoryId) {
-          return
+  // ________________________________________________________
+
+  const moveTaskToCategory = async (
+  task,
+  targetCategory,
+  targetPosition
+) => {
+  const sourceCategoryId = task.categoryId
+  const targetCategoryId = targetCategory.id
+
+  const body = {
+    categoryId: targetCategoryId,
+    position: String(targetPosition),
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/tasks/${task.id}/position`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify(body),
       }
+    )
 
-    try {
-      const response = await fetch(
-        `${API_BASE}/tasks/${task.id}/position`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${getToken()}`,
-          },
-          body: JSON.stringify(body),
-        }
+    if (!response.ok) {
+      const text = await response.text()
+      setEditError(
+        parseErrorMessage(text) || 'Could not move task'
       )
+      return
+    }
 
-      if (!response.ok) {
-        const text = await response.text()
-        setEditError(parseErrorMessage(text) || 'could not move task')
-        return
-      }
-      const result = await response.json()
-      const updatedTask = result.data.data
+    const result = await response.json()
+    const updatedTask = result.data.data
 
-      setCategories(categories.map((category) => {
+    setCategories((currentCategories) =>
+      currentCategories.map((category) => {
+
+        
+        if (
+          sourceCategoryId === targetCategoryId &&
+          category.id === sourceCategoryId
+        ) {
+          const reorderedTasks = [...(category.tasks ?? [])]
+            .sort((a, b) => a.position - b.position)
+            .filter((currentTask) => currentTask.id !== task.id)
+
+          reorderedTasks.splice(
+            targetPosition,
+            0,
+            updatedTask
+          )
+
+          return {
+            ...category,
+            tasks: reorderedTasks.map((currentTask, index) => ({
+              ...currentTask,
+              position: index,
+            })),
+          }
+        }
+
+        
         if (category.id === sourceCategoryId) {
+          const remainingTasks = (category.tasks ?? [])
+            .filter((currentTask) => currentTask.id !== task.id)
+            .map((currentTask, index) => ({
+              ...currentTask,
+              position: index,
+            }))
+
           return {
             ...category,
-            tasks: (category.tasks ?? []).filter(
-              (currentTask) => currentTask.id !== task.id
-            ),
+            tasks: remainingTasks,
           }
         }
 
+        
         if (category.id === targetCategoryId) {
+          const targetTasks = [...(category.tasks ?? [])]
+            .sort((a, b) => a.position - b.position)
+            .filter((currentTask) => currentTask.id !== task.id)
+
+          targetTasks.splice(
+            targetPosition,
+            0,
+            updatedTask
+          )
+
           return {
             ...category,
-            tasks: [
-              ...(category.tasks ?? []),
-              updatedTask,
-            ],
+            tasks: targetTasks.map((currentTask, index) => ({
+              ...currentTask,
+              position: index,
+            })),
           }
         }
 
-       return category
+        return category
       })
     )
-    } catch {
-      setEditError('Could not move task')
-    }
-
+  } catch {
+    setEditError('Could not move task')
   }
+}
 
   // ________________________________________________________
 
@@ -860,46 +914,94 @@ const handleEditCategory = async (e) => {
   // ________________________________________________________
 
   const handleDragEnd = ({ active, over }) => {
-    if (!over || active.id === over.id) {
-      return
-    }
+  if (!over || active.id === over.id) {
+    return
+  }
 
-    const targetCategory = categories.find(
-      (category) => category.id === over.id
-    )
+  // Er dragged item en category?
+  const draggedCategory = categories.find(
+    (category) => category.id === active.id
+  )
+
+  if (draggedCategory) {
+    const targetCategory =
+      categories.find((category) => category.id === over.id) ??
+      findCategoryByTaskId(over.id)
 
     if (!targetCategory) {
       return
     }
 
-    const draggedCategory = categories.find(
-      (category) => category.id === active.id
+    moveCategory(draggedCategory, targetCategory)
+    return
+  }
+
+  // Find den task som er dragged
+  let draggedTask = null
+
+  for (const category of categories) {
+    const foundTask = (category.tasks ?? []).find(
+      (task) => task.id === active.id
     )
 
-    if (draggedCategory) {
-      moveCategory(draggedCategory, targetCategory)
-      return
+    if (foundTask) {
+      draggedTask = foundTask
+      break
     }
-
-    let draggedTask = null
-
-    for (const category of categories) {
-      const foundTask = (category.tasks ?? []).find(
-        (task) => task.id === active.id
-      )
-
-      if (foundTask) {
-        draggedTask = foundTask
-        break
-      }
-    }
-
-    if (!draggedTask) {
-      return
-    }
-
-    moveTaskToCategory(draggedTask, targetCategory)
   }
+
+  if (!draggedTask) {
+    return
+  }
+
+ 
+  // Dropped på en anden category
+  const categoryDrop = categories.find(
+    (category) => category.id === over.id
+  )
+
+  if (categoryDrop) {
+    const targetPosition =
+      categoryDrop.tasks?.length ?? 0
+
+    moveTaskToCategory(
+      draggedTask,
+      categoryDrop,
+      targetPosition
+    )
+
+    return
+  }
+
+
+  // Dropped på en anden task
+  const targetCategory =
+    findCategoryByTaskId(over.id)
+
+  if (!targetCategory) {
+    return
+  }
+
+  const orderedTasks = [...(targetCategory.tasks ?? [])]
+    .sort((a, b) => a.position - b.position)
+
+  const targetPosition = orderedTasks.findIndex(
+    (task) => task.id === over.id
+  )
+
+  if (targetPosition === -1) {
+    return
+  }
+
+  moveTaskToCategory(
+    draggedTask,
+    targetCategory,
+    targetPosition
+  )
+}
+
+// ________________________________________________________
+
 
   return (
     <div className={styles.homePage}>

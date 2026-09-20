@@ -1,27 +1,29 @@
-import { useDraggable } from '@dnd-kit/core'
+// useSortable er en funktion der gør et object til et element der kan flyttes rundt i en sorteret liste.
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import styles from './CategoryColumn.module.css'
 
 function DraggableTask({ task, onEditTask, onDeleteTask, onToggleTask }) {
   const {
-    //giver de nødvendige html-elementer
+    //Tilføjer ekstra information til HTML-elementet som det har brug for.
     attributes,
-    //mouse-touch events
+    //Tilføjer de events der skal bruges for at starte drag. (pointer down, pointer move, pointer up)
     listeners,
-    //sættes på html-elementet der skal trækkes
+    //sætter referencen til et DOM-element (peger på hvad dnd-kit må måle og flytte)
     setNodeRef,
-    //fortæller hvor elementet skal flyttes visuelt under drag
+    //Transform indeholder beregningen til flytningen af et element. (animationen)
     transform,
-  } = useDraggable({
-    id: task.id,
+    transition,
+  } = useSortable({  
+    id: task.id, //useSortable skal bruge taskId, så vi ved hvad active.id er.
   })
   const style = {
-  transform: transform
-    ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-    : undefined,
-}
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
 
   return (
-    <li ref={setNodeRef} style={style} className={`${styles.task} ${task.completed ? styles.taskDone : ''}`} {...listeners} {...attributes}>
+    <li ref={setNodeRef} style={style} className={`${styles.task} ${task.completed ? styles.taskDone : ''} `} {...listeners} {...attributes}>
       <span className={styles.taskHeader}>
         <input
           className={styles.taskCheckbox}
