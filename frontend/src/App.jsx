@@ -28,17 +28,17 @@ function App() {
       <Route
         path="/homepage"
         element={
-          
+          <RequireToken>
             <HomePage />
-          
+          </RequireToken>
         }
       />
       <Route
         path="/create"
         element={
-          
+          <RequireToken>
             <CreateWeddingPage />
-          
+          </RequireToken>
         }
       />
       <Route path="*" element={<NotFoundPage />} />
