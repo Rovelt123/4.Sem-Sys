@@ -716,7 +716,7 @@ const handleEditCategory = async (e) => {
 
     const body = {
       title: createTaskForm.title,
-      deadline: createTaskForm.deadline,
+      deadline: createTaskForm.deadline === '' ? null : setCreateTaskForm.deadline,
       price: createTaskForm.price === '' ? '0' : createTaskForm.price,
       priority: createTaskForm.priority,
       description: createTaskForm.description,
