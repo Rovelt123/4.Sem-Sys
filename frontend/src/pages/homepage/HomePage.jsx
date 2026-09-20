@@ -918,7 +918,7 @@ const handleEditCategory = async (e) => {
     return
   }
 
-  // Er dragged item en category?
+  
   const draggedCategory = categories.find(
     (category) => category.id === active.id
   )
@@ -936,7 +936,7 @@ const handleEditCategory = async (e) => {
     return
   }
 
-  // Find den task som er dragged
+  
   let draggedTask = null
 
   for (const category of categories) {
@@ -955,7 +955,7 @@ const handleEditCategory = async (e) => {
   }
 
  
-  // Dropped på en anden category
+  
   const categoryDrop = categories.find(
     (category) => category.id === over.id
   )
@@ -974,7 +974,7 @@ const handleEditCategory = async (e) => {
   }
 
 
-  // Dropped på en anden task
+ 
   const targetCategory =
     findCategoryByTaskId(over.id)
 

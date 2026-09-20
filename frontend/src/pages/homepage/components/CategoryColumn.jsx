@@ -11,9 +11,7 @@ function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onD
         .sort((a, b) => a.position - b.position)
 
     const {
-        //betyder at det tilkoblede element er en dropzone
         setNodeRef,
-        //boolean true betyder at en task er over en dropzone false = ikke over
         isOver,} = useDroppable({id: category.id,})
 
     return (

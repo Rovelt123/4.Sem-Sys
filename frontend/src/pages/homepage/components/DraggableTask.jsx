@@ -1,21 +1,16 @@
-// useSortable er en funktion der gør et object til et element der kan flyttes rundt i en sorteret liste.
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import styles from './CategoryColumn.module.css'
 
 function DraggableTask({ task, onEditTask, onDeleteTask, onToggleTask }) {
   const {
-    //Tilføjer ekstra information til HTML-elementet som det har brug for.
     attributes,
-    //Tilføjer de events der skal bruges for at starte drag. (pointer down, pointer move, pointer up)
     listeners,
-    //sætter referencen til et DOM-element (peger på hvad dnd-kit må måle og flytte)
     setNodeRef,
-    //Transform indeholder beregningen til flytningen af et element. (animationen)
     transform,
     transition,
   } = useSortable({  
-    id: task.id, //useSortable skal bruge taskId, så vi ved hvad active.id er.
+    id: task.id, 
   })
   const style = {
     transform: CSS.Transform.toString(transform),
