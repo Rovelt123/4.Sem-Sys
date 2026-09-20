@@ -2,7 +2,7 @@ import styles from './CategoryColumn.module.css'
 import DraggableTask from './DraggableTask'
 import { useDroppable } from '@dnd-kit/core'
 
-function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onDeleteTask }) {
+function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onDeleteTask, onToggleTask }) {
 
     const isUncategorized = category.title === 'Uncategorized'
 
@@ -62,6 +62,7 @@ function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onD
                         task={task}
                         onEditTask={onEditTask}
                         onDeleteTask={onDeleteTask}
+                        onToggleTask={onToggleTask}
                     />
                 ))}
             </ul>

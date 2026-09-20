@@ -4,7 +4,7 @@ import styles from './HomePage.module.css'
 import CategoryColumn from './components/CategoryColumn.jsx'
 import {getToken, getUser, clearSession } from '../../utils/storage'
 import { DndContext } from '@dnd-kit/core'
-const API_BASE = 'http://sys2.roneu.dk/api' ?? 'http://localhost:9292/api'
+const API_BASE = 'https://sys2.roneu.dk/api'
 
 
 
@@ -62,6 +62,8 @@ function HomePage() {
 
   const [wedding, setWedding] = useState(null)
   const [loadingWedding, setLoadingWedding] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const [deleteError, setDeleteError] = useState('')
 
   const [showDeleteWarning, setShowDeleteWarning] = useState(false)
 
@@ -128,6 +130,7 @@ function HomePage() {
     0
   )
   const days = wedding ? daysUntil(wedding.date) : 0
+  const today = new Date().toISOString().slice(0, 10)
     // ________________________________________________________
 
   useEffect(() => {
@@ -164,6 +167,7 @@ function HomePage() {
       } catch (error) {
         console.error('Could not load wedding:', error)
         setWedding(null)
+        setLoadError('We could not load your wedding. Please try again.')
 
       } finally {
         setLoadingWedding(false)
@@ -247,6 +251,7 @@ function HomePage() {
         }
 
         setWedding(null)
+        setCategories([])
         setShowDeleteWarning(false)
 
       } catch (error) {
@@ -419,11 +424,22 @@ const handleEditCategory = async (e) => {
         throw new Error('Could not delete category')
       }
 
-      setCategories(
-        categories.filter(
-          category => category.id !== categoryToDelete.id
-        )
+      const refreshed = await fetch(
+        `${API_BASE}/weddings/${wedding.id}/categories`,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
       )
+
+      if (!refreshed.ok) {
+        throw new Error('Could not load categories')
+      }
+
+      const refreshedResult = await refreshed.json()
+
+      setCategories(refreshedResult.data.data)
 
       setCategoryToDelete(null)
       setShowDeleteCategoryWarning(false)
@@ -578,6 +594,7 @@ const handleEditCategory = async (e) => {
 
   const handleOpenDeleteTask = (task) => {
     setTaskToDelete(task)
+    setDeleteError('')
     setShowDeleteTaskWarning(true)
   }
 
@@ -613,6 +630,43 @@ const handleEditCategory = async (e) => {
 
     } catch (error) {
       console.error('Could not delete task:', error)
+      setDeleteError('The task could not be deleted. Please try again.')
+    }
+  }
+
+  // ________________________________________________________
+
+  const handleToggleTask = async (task) => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/tasks/${task.id}/completed`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Could not update the task')
+      }
+
+      const result = await response.json()
+
+      const updatedTask = result.data.data
+
+      setCategories(
+        categories.map((category) => ({
+          ...category,
+          tasks: (category.tasks ?? []).map((existing) =>
+            existing.id === task.id ? updatedTask : existing
+          ),
+        }))
+      )
+
+    } catch (error) {
+      console.error('Could not update the task:', error)
     }
   }
 
@@ -651,7 +705,7 @@ const handleEditCategory = async (e) => {
     const body = {
       title: createTaskForm.title,
       deadline: createTaskForm.deadline,
-      price: createTaskForm.price,
+      price: createTaskForm.price === '' ? '0' : createTaskForm.price,
       priority: createTaskForm.priority,
       description: createTaskForm.description,
     }
@@ -823,10 +877,19 @@ const handleEditCategory = async (e) => {
           <p>Loading wedding...</p>
         )}
 
-        {!loadingWedding && !wedding && (
+        {!loadingWedding && loadError && (
           <section className={styles.summary}>
-            <h2>You haven't created a wedding yet</h2>
-            <p>Use the Create wedding button to get started.</p>
+            <h2 className={styles.emptyTitle}>Something went wrong</h2>
+            <p className={styles.emptyText}>{loadError}</p>
+          </section>
+        )}
+
+        {!loadingWedding && !wedding && !loadError && (
+          <section className={styles.summary}>
+            <h2 className={styles.emptyTitle}>You haven't created a wedding yet</h2>
+            <p className={styles.emptyText}>Use the Create wedding button to get started.</p>
+
+            <button className={styles.createWedding} onClick={handleCreateWedding}>Create wedding</button>
           </section>
         )}
 
@@ -862,6 +925,11 @@ const handleEditCategory = async (e) => {
                   <span className={styles.statValue}> {taskCount} </span>
                   <span className={styles.statLabel}> tasks </span>
                 </div>
+
+                <div className={styles.stat}>
+                  <span className={styles.statValue}> {wedding.budget.toLocaleString('en-US')} kr. </span>
+                  <span className={styles.statLabel}> budget </span>
+                </div>
               </div>
             </section>
 
@@ -873,7 +941,7 @@ const handleEditCategory = async (e) => {
           {categories.map((category) => (
             <CategoryColumn
               key={category.id}
-              category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onEditTask={handleOpenEditTask} onDeleteTask={handleOpenDeleteTask}
+              category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onEditTask={handleOpenEditTask} onDeleteTask={handleOpenDeleteTask} onToggleTask={handleToggleTask}
             />
           ))}
 
@@ -922,7 +990,7 @@ const handleEditCategory = async (e) => {
                 Date
               </label>
 
-              <input id="edit-date" name="date" type="date" value={editForm.date} onChange={handleEditChange} required />
+              <input id="edit-date" name="date" type="date" value={editForm.date} onChange={handleEditChange} min={today} required />
 
               <label htmlFor="edit-location">
                 Location
@@ -1051,7 +1119,7 @@ const handleEditCategory = async (e) => {
               <input id="edit-task-deadline" name="deadline" type="date" value={editTaskForm.deadline} onChange={handleEditChangeTask} required />
 
               <label htmlFor="edit-task-price"> Price </label>
-              <input id="edit-task-price" name="price" type="number" min="0" step="1" value={editTaskForm.price} onChange={handleEditChangeTask} required />
+              <input id="edit-task-price" name="price" type="number" min="0" step="1" value={editTaskForm.price} onChange={handleEditChangeTask} />
 
               <label htmlFor="edit-task-hours"> Estimated hours </label>
               <input id="edit-task-hours" name="estimatedHours" type="number" min="0" step="0.5" value={editTaskForm.estimatedHours} onChange={handleEditChangeTask} required />
@@ -1089,6 +1157,10 @@ const handleEditCategory = async (e) => {
 
               <p> Are you sure you want to delete {taskToDelete.title}?</p>
 
+              {deleteError && (
+                <p className={styles.editError}> {deleteError} </p>
+              )}
+
               <div className={styles.modalActions}>
                 <button className={styles.deleteWedding} onClick={() => {setShowDeleteTaskWarning(false), setTaskToDelete(null)}}>Cancel</button>
                 <button className={styles.deleteWedding} onClick={handleDeleteTask}>Delete</button>
@@ -1113,7 +1185,7 @@ const handleEditCategory = async (e) => {
               <input id="task-deadline" name="deadline" type="date" value={createTaskForm.deadline} onChange={handleCreateChangeTask} required />
 
               <label htmlFor="task-price"> Price </label>
-              <input id="task-price" name="price" type="number" min="0" step="1" value={createTaskForm.price} onChange={handleCreateChangeTask} required />
+              <input id="task-price" name="price" type="number" min="0" step="1" value={createTaskForm.price} onChange={handleCreateChangeTask} />
 
               <label htmlFor="task-hours"> Estimated hours </label>
               <input id="task-hours" name="estimatedHours" type="number" min="0" step="0.5" value={createTaskForm.estimatedHours} onChange={handleCreateChangeTask} />

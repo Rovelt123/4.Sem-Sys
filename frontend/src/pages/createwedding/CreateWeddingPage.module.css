@@ -39,7 +39,7 @@
 }
 
 .createWordmark em {
-  font-family: "Cormorant Garamond", "Manrope", serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-style: italic;
   font-weight: 600;
   font-size: 1.15em;
@@ -120,8 +120,8 @@
   margin: 1rem 0 0;
   padding: 0.625rem 0.75rem;
   font-size: 0.875rem;
-  color: #b3261e;
-  background: #fdecec;
+  color: var(--danger-ink);
+  background: var(--danger-soft);
   border-radius: 0.75rem;
 }
 
