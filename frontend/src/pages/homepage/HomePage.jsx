@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import styles from './HomePage.module.css'
 import CategoryColumn from './components/CategoryColumn.jsx'
+import DraggableCategory from './components/DraggableCategory.jsx'
 import {getToken, getUser, clearSession } from '../../utils/storage'
 import { DndContext } from '@dnd-kit/core'
 const API_BASE = 'https://sys2.roneu.dk/api'
@@ -819,8 +820,64 @@ const handleEditCategory = async (e) => {
 
   // ________________________________________________________
 
+  const moveCategory = async (category, targetCategory) => {
+    const targetPosition = categories.findIndex(
+      (item) => item.id === targetCategory.id
+    )
+
+    if (targetPosition < 0) {
+      return
+    }
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/categories/${category.id}/position`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({ position: String(targetPosition) }),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Could not move the category')
+      }
+
+      const reordered = categories.filter((item) => item.id !== category.id)
+
+      reordered.splice(targetPosition, 0, category)
+
+      setCategories(reordered)
+
+    } catch (error) {
+      console.error('Could not move the category:', error)
+    }
+  }
+
+  // ________________________________________________________
+
   const handleDragEnd = ({ active, over }) => {
-    if (!over) {
+    if (!over || active.id === over.id) {
+      return
+    }
+
+    const targetCategory = categories.find(
+      (category) => category.id === over.id
+    )
+
+    if (!targetCategory) {
+      return
+    }
+
+    const draggedCategory = categories.find(
+      (category) => category.id === active.id
+    )
+
+    if (draggedCategory) {
+      moveCategory(draggedCategory, targetCategory)
       return
     }
 
@@ -837,11 +894,7 @@ const handleEditCategory = async (e) => {
       }
     }
 
-    const targetCategory = categories.find(
-      (category) => category.id === over.id
-    )
-
-    if (!draggedTask || !targetCategory) {
+    if (!draggedTask) {
       return
     }
 
@@ -939,7 +992,7 @@ const handleEditCategory = async (e) => {
       <DndContext onDragEnd={handleDragEnd}>
         <div className={styles.categoryBoard}>
           {categories.map((category) => (
-            <CategoryColumn
+            <DraggableCategory
               key={category.id}
               category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onEditTask={handleOpenEditTask} onDeleteTask={handleOpenDeleteTask} onToggleTask={handleToggleTask}
             />
