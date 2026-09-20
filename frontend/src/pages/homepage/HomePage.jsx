@@ -792,6 +792,83 @@ const handleEditCategory = async (e) => {
     moveTaskToCategory(draggedTask, targetCategory)
   }
 
+   // ________________________________________________________
+
+   const moveCategoryToNewPosition = async (currentCategory, targetCategory) => {
+
+const body = {
+
+  CategoryId: currentCategory.id,
+  position: targetCategory.position,
+}
+
+const currentCategoryId = currentCategory.id
+const targetCategoryId = targetCategory.id
+
+if(currentCategoryId === targetCategoryId){
+    return
+}
+
+try{
+const response = await fetch(
+  `${API_BASE}/category/${currentCategory.id}/position`,
+  {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify(body),
+        }
+      )
+
+      if (!response.ok) {
+        const text = await response.text()
+        setEditError(parseErrorMessage(text) || 'could not move category')
+        return
+      }
+await loadCategories()
+}
+catch {
+      setEditError('Could not move category')
+    }
+
+   // ________________________________________________________
+
+   const loadCategories = async () => {
+  if (!wedding) {
+    return
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/weddings/${wedding.id}/categories`,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error('Could not move categori')
+    }
+
+    const result = await response.json()
+    const categories = result.data.data
+
+    setCategories(categories)
+
+  } catch (error) {
+    console.error('Could not move categori:', error)
+    setCategories([])
+  }
+}
+
+   // ________________________________________________________
+
+   // ________________________________________________________
+
   return (
     <div className={styles.homePage}>
       <header className={styles.topBar}>
