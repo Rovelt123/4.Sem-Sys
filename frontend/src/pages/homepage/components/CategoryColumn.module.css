@@ -151,3 +151,32 @@
   outline: 0.0625rem dotted var(--ink);
   outline-offset: 0.1875rem;
 }
+
+.draggableCategory {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.moveHandle {
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    align-self: flex-start;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    cursor: grab;
+
+    font-size: 0.75rem;
+}
+
+.moveHandle:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+}
