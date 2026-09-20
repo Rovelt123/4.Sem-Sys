@@ -68,7 +68,7 @@ public class WeddingController extends BaseController<Wedding, WeddingDTO> {
         Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
         UUID weddingId = ErrorHandler.tryParseUUID(body.get("wedding_id"), Notifications.WEDDING_NOT_FOUND.getDisplayName());
 
-        Wedding wedding = weddingDAO.getByIdAndOwnerId(userService.getOwnerId(ctx), weddingId);
+        Wedding wedding = weddingDAO.getByIdAndOwnerId(weddingId, userService.getOwnerId(ctx));
         WeddingDTO weddingDTO = weddingMapper.toDTO(wedding);
         respond(ctx, 200, messageService.buildMessage(Notifications.GET_BY_ID, "wedding", body.get("wedding_id")), Map.of("data", weddingDTO));
     }

@@ -6,9 +6,14 @@ import lombok.Getter;
 public enum Categories {
 
     UNCATEGORIZED("Uncategorized"),
-    CATERING("Catering"),
-    DRINKS("Alcohol & soft drinks"),
-    SNACKS("Snacks");
+    VENUE("Venue"),
+    GUESTS("Guests"),
+    FOOD_AND_DRINK("Food & drinks"),
+    CEREMONY("Ceremony"),
+    ATTIRE("Attire"),
+    FLOWERS_AND_DECOR("Flowers & decor"),
+    ENTERTAINMENT("Entertainment"),
+    PAPERWORK("Paperwork");
 
     // ________________________________________________________
 

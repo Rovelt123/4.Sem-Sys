@@ -31,7 +31,7 @@
 }
 
 .wordmark em {
-  font-family: "Cormorant Garamond", "Manrope", serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-style: italic;
   font-weight: 600;
   font-size: 1.15em;
@@ -78,8 +78,8 @@
   cursor: pointer;
 }
 .createWedding:hover {
-  color: var(--danger-ink);
-  border-color: var(--danger-ink);
+  color: var(--accent-ink);
+  border-color: var(--accent-ink);
 }
 
 .deleteWedding {
@@ -159,6 +159,7 @@
 }
 
 .summaryStats {
+  flex-wrap: wrap;
   display: flex;
   flex-wrap: wrap;
   gap: 2.5rem;
@@ -523,4 +524,31 @@
 
 .homePage {
     background: var(--bg);
+}
+
+.emptyTitle {
+    margin: 0 0 0.5rem;
+
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 2rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+}
+
+.emptyText {
+    margin: 0 0 1.5rem;
+
+    color: var(--ink-soft);
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 1.25rem;
+}
+
+.createWedding,
+.deleteWedding,
+.logout {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.09375rem;
+    text-transform: uppercase;
 }

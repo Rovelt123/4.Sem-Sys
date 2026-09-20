@@ -80,7 +80,7 @@ class CategoryDAOTest extends EntityManagerDAOTest<Category> {
         List<Category> found = categoryDAO.getAllByWeddingIdAndOwnerId(wedding.getId(),testUser.getId());
 
         assertEquals(1, found.size());
-        assertEquals("Catering", found.get(0).getTitle());
+        assertEquals("Food & drinks", found.get(0).getTitle());
         assertEquals(wedding.getId(), found.get(0).getWedding().getId());
 
     }
@@ -91,7 +91,7 @@ class CategoryDAOTest extends EntityManagerDAOTest<Category> {
     void getAllByWeddingIdAndOwnerIdOnlyGetCategoriesForRequestedWedding() {
 
 
-        categoryDAO.create(category);  // category belongs to wedding, and is Catering
+        categoryDAO.create(category);  // category belongs to wedding, and is Food & drinks
         categoryDAO.create(category2); // category2 belongs to wedding2
 
         em.flush();
@@ -100,8 +100,8 @@ class CategoryDAOTest extends EntityManagerDAOTest<Category> {
         List<Category> found = categoryDAO.getAllByWeddingIdAndOwnerId(wedding.getId(),testUser.getId());
 
         assertEquals(1, found.size());
-        assertEquals("Catering", found.get(0).getTitle());
-        // testUser have to weddings with CATERING, corret one have position 1, the wrong one have position 2
+        assertEquals("Food & drinks", found.get(0).getTitle());
+        // testUser have to weddings with FOOD_AND_DRINK, corret one have position 1, the wrong one have position 2
         assertEquals(1, found.get(0).getPosition());
 
     }
@@ -112,7 +112,7 @@ class CategoryDAOTest extends EntityManagerDAOTest<Category> {
     void getByIdAndOwnerId() {
 
         Category category3 = Category.builder()
-                .title(Categories.DRINKS.getDisplayName())
+                .title(Categories.VENUE.getDisplayName())
                 .position(2)
                 .wedding(wedding)
                 .build();
@@ -126,8 +126,8 @@ class CategoryDAOTest extends EntityManagerDAOTest<Category> {
         Category found = categoryDAO.getByIdAndOwnerId(category3.getId(), testUser.getId());
 
         assertNotNull(found);
-        // Enum DRINKS -> "Alcohol & soft drinks"
-        assertEquals("Alcohol & soft drinks", found.getTitle());
+        // Enum VENUE -> "Venue"
+        assertEquals("Venue", found.getTitle());
         assertEquals(wedding.getId(), found.getWedding().getId());
 
     }

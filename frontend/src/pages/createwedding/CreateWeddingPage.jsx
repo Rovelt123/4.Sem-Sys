@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router'
 import { getToken } from '../../utils/storage'
 import styles from './CreateWeddingPage.module.css'
 
-const API_BASE = 'https://sys2.roneu.dk/api' ?? 'http://localhost:9292/api'
+const API_BASE = 'https://sys2.roneu.dk/api'
 
 // ________________________________________________________
 
@@ -35,6 +35,8 @@ function CreateWeddingPage() {
   const [loading, setLoading] = useState(false)
 
   const navigate = useNavigate()
+
+  const today = new Date().toISOString().slice(0, 10)
 
   // ________________________________________________________
 
@@ -115,6 +117,7 @@ function CreateWeddingPage() {
           type="date"
           value={form.date}
           onChange={handleChange}
+          min={today}
           required
         />
 

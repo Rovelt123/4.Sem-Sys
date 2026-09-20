@@ -8,7 +8,6 @@ import NotFoundPage from "./pages/notfound/NotFoundPage";
 import CreateWeddingPage from "./pages/createwedding/CreateWeddingPage";
 import ConfirmEmailPage from './pages/ConfirmEmailPage/ConfirmEmailPage';
 import { getToken } from "./utils/storage";
-import './App.css';
 
 // ________________________________________________________
 
@@ -29,17 +28,17 @@ function App() {
       <Route
         path="/homepage"
         element={
-          
+          <RequireToken>
             <HomePage />
-          
+          </RequireToken>
         }
       />
       <Route
         path="/create"
         element={
-          
+          <RequireToken>
             <CreateWeddingPage />
-          
+          </RequireToken>
         }
       />
       <Route path="*" element={<NotFoundPage />} />

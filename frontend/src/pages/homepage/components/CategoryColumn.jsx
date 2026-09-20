@@ -2,12 +2,14 @@ import styles from './CategoryColumn.module.css'
 import DraggableTask from './DraggableTask'
 import { useDroppable } from '@dnd-kit/core'
 
-function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onDeleteTask }) {
+function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onDeleteTask, onToggleTask }) {
 
     const isUncategorized = category.title === 'Uncategorized'
 
     const tasks = [...(category.tasks ?? [])]
         .sort((a, b) => a.position - b.position)
+
+    const totalHours = tasks.reduce((sum, task) => sum + (task.estimatedHours ?? 0), 0)
 
     const {
         //betyder at det tilkoblede element er en dropzone
@@ -51,6 +53,12 @@ function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onD
                 </div>
             </div>
 
+            {tasks.length > 0 && (
+                <p className={styles.columnTotals}>
+                    {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}, {Math.round(totalHours * 10) / 10} h
+                </p>
+            )}
+
             {tasks.length === 0 && (
                 <p className={styles.empty}>No tasks yet</p>
             )}
@@ -62,6 +70,7 @@ function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onD
                         task={task}
                         onEditTask={onEditTask}
                         onDeleteTask={onDeleteTask}
+                        onToggleTask={onToggleTask}
                     />
                 ))}
             </ul>

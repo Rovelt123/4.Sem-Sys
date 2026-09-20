@@ -49,6 +49,7 @@ public class TaskService {
         task.setPosition(position);
         category.addTask(task);
         return taskDAO.create(task);
+
     }
 
     // ________________________________________________________
@@ -125,7 +126,14 @@ public class TaskService {
 
         float price = ErrorHandler.tryParseFloat(body.get("price"), Notifications.MUST_BE_FLOAT.getDisplayName());
 
-        LocalDate deadline = ErrorHandler.tryParseLocalDate(body.get("deadline"), Notifications.TASK_DEADLINE_INVALID.getDisplayName());
+        LocalDate deadline = null;
+
+        String deadlineInput = body.get("deadline");
+
+        if (deadlineInput != null && !deadlineInput.isBlank()) {
+            deadline = ErrorHandler.tryParseLocalDate(deadlineInput, Notifications.TASK_DEADLINE_INVALID.getDisplayName());
+        }
+        
         String link = body.get("link");
 
         float hours = ErrorHandler.tryParseFloat(body.get("estimatedHours"), Notifications.TASK_ESTIMATE_INVALID.getDisplayName());

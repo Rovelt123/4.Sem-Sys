@@ -75,7 +75,7 @@ public class TaskController extends BaseController<Task, TaskDTO> {
         Map<String, String> body = ErrorHandler.tryBodyMap(ctx, Notifications.BODY_EMPTY.getDisplayName());
         UUID taskId = ErrorHandler.tryParseUUID(body.get("task_id"), Notifications.TASK_ID_INVALID.getDisplayName());
 
-        Task task = taskDAO.getByIdAndOwnerId(userService.getOwnerId(ctx), taskId);
+        Task task = taskDAO.getByIdAndOwnerId(taskId, userService.getOwnerId(ctx));
         TaskDTO taskDTO = taskMapper.toDTO(task);
         respond(ctx, 200, messageService.buildMessage(Notifications.GET_BY_ID, "task", body.get("task_id")), Map.of("data", taskDTO));
     }

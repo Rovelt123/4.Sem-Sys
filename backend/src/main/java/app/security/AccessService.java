@@ -40,7 +40,7 @@ public class AccessService implements IAccessService {
         } catch (UnauthorizedResponse e) {
             throw new UnauthorizedResponse(e.getMessage());
         } catch (Exception e) {
-            throw new UnauthorizedResponse("You need to log in, dude! Or you token is invalid.");
+            throw new UnauthorizedResponse("You need to log in, or your session has expired.");
         }
 
         // Check if the user has the necessary roles to access the route
