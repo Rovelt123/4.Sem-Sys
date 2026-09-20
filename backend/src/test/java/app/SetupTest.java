@@ -129,13 +129,13 @@ public abstract class SetupTest {
     protected void setupCategoryTest() {
 
         category = Category.builder()
-                .title(Categories.CATERING.getDisplayName())
+                .title(Categories.FOOD_AND_DRINK.getDisplayName())
                 .position(1)
                 .wedding(wedding)
                 .build();
 
         category2 = Category.builder()
-                .title(Categories.CATERING.getDisplayName())
+                .title(Categories.FOOD_AND_DRINK.getDisplayName())
                 .position(2)
                 .wedding(wedding2)
                 .build();

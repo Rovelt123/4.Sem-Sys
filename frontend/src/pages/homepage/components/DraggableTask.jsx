@@ -1,7 +1,7 @@
 import { useDraggable } from '@dnd-kit/core'
 import styles from './CategoryColumn.module.css'
 
-function DraggableTask({ task, onEditTask, onDeleteTask }) {
+function DraggableTask({ task, onEditTask, onDeleteTask, onToggleTask }) {
   const {
     //giver de nødvendige html-elementer
     attributes,
@@ -21,8 +21,17 @@ function DraggableTask({ task, onEditTask, onDeleteTask }) {
 }
 
   return (
-    <li ref={setNodeRef} style={style} className={styles.task}{...listeners}{...attributes}>
+    <li ref={setNodeRef} style={style} className={`${styles.task} ${task.completed ? styles.taskDone : ''}`} {...listeners} {...attributes}>
       <span className={styles.taskHeader}>
+        <input
+          className={styles.taskCheckbox}
+          type="checkbox"
+          checked={task.completed}
+          onPointerDown={(e) => e.stopPropagation()}
+          onChange={() => onToggleTask(task)}
+          aria-label={`Mark ${task.title} as done`}
+        />
+
         <span className={styles.taskTitle}>
           {task.title}
         </span>
@@ -58,6 +67,21 @@ function DraggableTask({ task, onEditTask, onDeleteTask }) {
           <span className={styles.metaRow}>
             <span className={styles.metaLabel}>Price:</span>
             <span className={styles.metaValue}>{task.price.toLocaleString('en-US')} kr.</span>
+          </span>
+        )}
+
+        {task.link && (
+          <span className={styles.metaRow}>
+            <span className={styles.metaLabel}>Link:</span>
+            <a
+              className={styles.taskLink}
+              href={task.link}
+              target="_blank"
+              rel="noreferrer"
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              Open
+            </a>
           </span>
         )}
       </span>

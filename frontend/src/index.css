@@ -4,9 +4,12 @@
   --surface: #ffffff;
   --ink: #2b2a26;
   --ink-soft: #6f6a60;
-  --line: #ddd5c8;
+  --line: #cec2ae;
   --accent-soft: #ece5d8;
   --accent-ink: #6d5f4b;
+
+  --success-ink: #536f5a;
+  --success-soft: #edf4ee;
 
   --danger: #c15b6a;
   --danger-ink: #8a3f4b;
@@ -25,6 +28,11 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
   min-height: 100vh;
 }
 
