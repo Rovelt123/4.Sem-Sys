@@ -110,7 +110,7 @@ class TaskDAOTest extends EntityManagerDAOTest<Task> {
     void getAllByCategoryIdAndOwnerIdFailWrongCategory() {
 
        Category category3 = Category.builder()
-                .title(Categories.DRINKS.getDisplayName())
+                .title(Categories.VENUE.getDisplayName())
                 .position(2)
                 .wedding(wedding)
                 .build();
