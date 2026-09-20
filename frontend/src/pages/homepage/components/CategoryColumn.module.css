@@ -132,6 +132,12 @@
   color: var(--ink-soft);
 }
 
+.taskLink {
+  color: var(--accent-ink);
+  font-size: 0.75rem;
+  text-decoration: underline;
+}
+
 .metaValue {
   color: var(--accent-ink);
   text-transform: lowercase;

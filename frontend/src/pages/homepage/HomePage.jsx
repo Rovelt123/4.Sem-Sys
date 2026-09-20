@@ -62,6 +62,8 @@ function HomePage() {
 
   const [wedding, setWedding] = useState(null)
   const [loadingWedding, setLoadingWedding] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const [deleteError, setDeleteError] = useState('')
 
   const [showDeleteWarning, setShowDeleteWarning] = useState(false)
 
@@ -165,6 +167,7 @@ function HomePage() {
       } catch (error) {
         console.error('Could not load wedding:', error)
         setWedding(null)
+        setLoadError('We could not load your wedding. Please try again.')
 
       } finally {
         setLoadingWedding(false)
@@ -591,6 +594,7 @@ const handleEditCategory = async (e) => {
 
   const handleOpenDeleteTask = (task) => {
     setTaskToDelete(task)
+    setDeleteError('')
     setShowDeleteTaskWarning(true)
   }
 
@@ -626,6 +630,7 @@ const handleEditCategory = async (e) => {
 
     } catch (error) {
       console.error('Could not delete task:', error)
+      setDeleteError('The task could not be deleted. Please try again.')
     }
   }
 
@@ -872,7 +877,14 @@ const handleEditCategory = async (e) => {
           <p>Loading wedding...</p>
         )}
 
-        {!loadingWedding && !wedding && (
+        {!loadingWedding && loadError && (
+          <section className={styles.summary}>
+            <h2 className={styles.emptyTitle}>Something went wrong</h2>
+            <p className={styles.emptyText}>{loadError}</p>
+          </section>
+        )}
+
+        {!loadingWedding && !wedding && !loadError && (
           <section className={styles.summary}>
             <h2 className={styles.emptyTitle}>You haven't created a wedding yet</h2>
             <p className={styles.emptyText}>Use the Create wedding button to get started.</p>
@@ -1144,6 +1156,10 @@ const handleEditCategory = async (e) => {
               <h2>Delete task?</h2>
 
               <p> Are you sure you want to delete {taskToDelete.title}?</p>
+
+              {deleteError && (
+                <p className={styles.editError}> {deleteError} </p>
+              )}
 
               <div className={styles.modalActions}>
                 <button className={styles.deleteWedding} onClick={() => {setShowDeleteTaskWarning(false), setTaskToDelete(null)}}>Cancel</button>

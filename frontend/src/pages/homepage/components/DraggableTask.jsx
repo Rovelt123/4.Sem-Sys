@@ -69,6 +69,21 @@ function DraggableTask({ task, onEditTask, onDeleteTask, onToggleTask }) {
             <span className={styles.metaValue}>{task.price.toLocaleString('en-US')} kr.</span>
           </span>
         )}
+
+        {task.link && (
+          <span className={styles.metaRow}>
+            <span className={styles.metaLabel}>Link:</span>
+            <a
+              className={styles.taskLink}
+              href={task.link}
+              target="_blank"
+              rel="noreferrer"
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              Open
+            </a>
+          </span>
+        )}
       </span>
     </li>
   )
