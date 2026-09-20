@@ -9,6 +9,8 @@ function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onD
     const tasks = [...(category.tasks ?? [])]
         .sort((a, b) => a.position - b.position)
 
+    const totalHours = tasks.reduce((sum, task) => sum + (task.estimatedHours ?? 0), 0)
+
     const {
         //betyder at det tilkoblede element er en dropzone
         setNodeRef,
@@ -50,6 +52,12 @@ function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onD
                     )}
                 </div>
             </div>
+
+            {tasks.length > 0 && (
+                <p className={styles.columnTotals}>
+                    {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}, {Math.round(totalHours * 10) / 10} h
+                </p>
+            )}
 
             {tasks.length === 0 && (
                 <p className={styles.empty}>No tasks yet</p>

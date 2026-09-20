@@ -71,7 +71,6 @@ function HomePage() {
   const navigate = useNavigate()
 
   const [showEditWedding, setShowEditWedding] = useState(false)
-  //
   const [editForm, setEditForm] = useState({
     title: '',
     date: '',
@@ -130,6 +129,18 @@ function HomePage() {
     (total, category) => total + (category.tasks?.length ?? 0),
     0
   )
+  const totalHours = categories.reduce(
+    (total, category) =>
+      total + (category.tasks ?? []).reduce((sum, task) => sum + (task.estimatedHours ?? 0), 0),
+    0
+  )
+
+  const totalPrice = categories.reduce(
+    (total, category) =>
+      total + (category.tasks ?? []).reduce((sum, task) => sum + (task.price ?? 0), 0),
+    0
+  )
+
   const days = wedding ? daysUntil(wedding.date) : 0
   const today = new Date().toISOString().slice(0, 10)
     // ________________________________________________________
@@ -980,8 +991,17 @@ const handleEditCategory = async (e) => {
                 </div>
 
                 <div className={styles.stat}>
-                  <span className={styles.statValue}> {wedding.budget.toLocaleString('en-US')} kr. </span>
-                  <span className={styles.statLabel}> budget </span>
+                  <span className={styles.statValue}> {Math.round(totalHours * 10) / 10} </span>
+                  <span className={styles.statLabel}> hours of work </span>
+                </div>
+
+                <div className={styles.stat}>
+                  <span className={styles.statValue}> {totalPrice.toLocaleString('en-US')} kr. </span>
+                  <span className={styles.statLabel}>
+                    {wedding.budget > 0
+                      ? `of ${wedding.budget.toLocaleString('en-US')} kr. budget`
+                      : 'planned cost'}
+                  </span>
                 </div>
               </div>
             </section>
