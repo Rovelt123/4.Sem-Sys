@@ -1,27 +1,24 @@
-import { useDraggable } from '@dnd-kit/core'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import styles from './CategoryColumn.module.css'
 
 function DraggableTask({ task, onEditTask, onDeleteTask, onToggleTask }) {
   const {
-    //giver de nødvendige html-elementer
     attributes,
-    //mouse-touch events
     listeners,
-    //sættes på html-elementet der skal trækkes
     setNodeRef,
-    //fortæller hvor elementet skal flyttes visuelt under drag
     transform,
-  } = useDraggable({
-    id: task.id,
+    transition,
+  } = useSortable({  
+    id: task.id, 
   })
   const style = {
-  transform: transform
-    ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-    : undefined,
-}
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
 
   return (
-    <li ref={setNodeRef} style={style} className={`${styles.task} ${task.completed ? styles.taskDone : ''}`} {...listeners} {...attributes}>
+    <li ref={setNodeRef} style={style} className={`${styles.task} ${task.completed ? styles.taskDone : ''} `} {...listeners} {...attributes}>
       <span className={styles.taskHeader}>
         <input
           className={styles.taskCheckbox}
