@@ -5,7 +5,7 @@ import CategoryColumn from './components/CategoryColumn.jsx'
 import DraggableCategory from './components/DraggableCategory.jsx'
 import {getToken, getUser, clearSession } from '../../utils/storage'
 import { DndContext } from '@dnd-kit/core'
-const API_BASE = 'https://sys2.roneu.dk/api'
+const API_BASE = 'http://localhost:9292/api'
 
 
 
@@ -129,6 +129,12 @@ function HomePage() {
     (total, category) => total + (category.tasks?.length ?? 0),
     0
   )
+
+  const completedTaskCount = categories.reduce(
+    (total, category) => total + (category.tasks ?? []).filter((task => task.status === 'DONE')).length,
+    0
+  )
+
   const totalHours = categories.reduce(
     (total, category) =>
       total + (category.tasks ?? []).reduce((sum, task) => sum + (task.estimatedHours ?? 0), 0),
@@ -646,22 +652,27 @@ const handleEditCategory = async (e) => {
     }
   }
 
-  // ________________________________________________________
 
-  const handleToggleTask = async (task) => {
+// ________________________________________________________
+
+  const handleStatusTask = async(task, newStatus) => {
     try {
       const response = await fetch(
-        `${API_BASE}/tasks/${task.id}/completed`,
+        `${API_BASE}/tasks/${task.id}/status`,
         {
           method: 'PATCH',
           headers: {
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${getToken()}`,
           },
+          body: JSON.stringify({
+            status: newStatus,
+          }),
         }
       )
 
       if (!response.ok) {
-        throw new Error('Could not update the task')
+        throw new Error('Could not update the task status')
       }
 
       const result = await response.json()
@@ -676,9 +687,8 @@ const handleEditCategory = async (e) => {
           ),
         }))
       )
-
-    } catch (error) {
-      console.error('Could not update the task:', error)
+    }catch (error) {
+      console.error('Could not update the task status:', error)
     }
   }
 
@@ -1093,6 +1103,11 @@ const handleEditCategory = async (e) => {
                 </div>
 
                 <div className={styles.stat}>
+                  <span className={styles.statValue}> {completedTaskCount} </span>
+                  <span className={styles.statLabel}> completed tasks </span>
+                </div>
+
+                <div className={styles.stat}>
                   <span className={styles.statValue}> {Math.round(totalHours * 10) / 10} </span>
                   <span className={styles.statLabel}> hours of work </span>
                 </div>
@@ -1116,7 +1131,7 @@ const handleEditCategory = async (e) => {
           {categories.map((category) => (
             <DraggableCategory
               key={category.id}
-              category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onEditTask={handleOpenEditTask} onDeleteTask={handleOpenDeleteTask} onToggleTask={handleToggleTask}
+              category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onEditTask={handleOpenEditTask} onDeleteTask={handleOpenDeleteTask} onChangeStatus={handleStatusTask}
             />
           ))}
 
