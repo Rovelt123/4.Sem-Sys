@@ -5,6 +5,7 @@ import app.entities.Category;
 import app.entities.Wedding;
 import app.entities.Task;
 import app.mappers.generic.IMapper;
+import app.services.BudgetService;
 import app.utils.ErrorHandler;
 import app.enums.Notifications;
 
@@ -68,6 +69,10 @@ public class WeddingMapper implements IMapper<Wedding, WeddingDTO> {
             .taskCount(entity.getCategories().stream().mapToInt(category -> category.getTasks().size()).sum())
             .completedTaskCount(entity.getCategories().stream().flatMap(category -> category.getTasks().stream()).filter(Task::isCompleted).count())
             .totalEstimatedHours(entity.getCategories().stream().flatMap(category -> category.getTasks().stream()).mapToDouble(Task::getEstimatedHours).sum())
+            .totalSpent(BudgetService.totalSpent(entity))
+            .remainingBudget(BudgetService.remainingBudget(entity))
+            .budgetUsedPercent(BudgetService.budgetUsedPercent(entity))
+            .budgetOverrun(BudgetService.budgetOverrun(entity))
             .categories(
                 entity.getCategories().stream()
                 .sorted(Comparator.comparingInt(Category::getPosition).thenComparing(Category::getId))
