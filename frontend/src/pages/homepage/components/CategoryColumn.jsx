@@ -12,6 +12,10 @@ function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onD
 
     const totalHours = tasks.reduce((sum, task) => sum + (task.estimatedHours ?? 0), 0)
 
+    const totalTasksPrice = tasks.reduce((sum, task) => sum + (task.price ?? 0),
+    0
+)
+
     const {
         setNodeRef,
         isOver,} = useDroppable({id: category.id,})
@@ -54,7 +58,8 @@ function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onD
 
             {tasks.length > 0 && (
                 <p className={styles.columnTotals}>
-                    {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}, {Math.round(totalHours * 10) / 10} h
+                    {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}, {Math.round(totalHours * 10) / 10} h,
+                total expence {totalTasksPrice} kr.
                 </p>
             )}
 
