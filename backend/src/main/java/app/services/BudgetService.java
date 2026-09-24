@@ -1,5 +1,6 @@
 package app.services;
 
+import app.entities.Category;
 import app.entities.Task;
 import app.entities.Wedding;
 
@@ -15,6 +16,19 @@ public class BudgetService {
                 .mapToDouble(Task::getPrice)
                 .sum();
     }
+
+    // ________________________________________________________
+
+    public static double totalSpentCategory(Category category){
+        if (category == null || category.getTasks() == null){
+            return  0;
+        }
+        return category.getTasks().stream()
+                .mapToDouble(Task::getPrice)
+                .sum();
+        }
+
+
 
     // ________________________________________________________
 
