@@ -125,10 +125,18 @@ function HomePage() {
     description: '',
   })
 
+  const [showBudgetOverview, setShowBudgetOverview] = useState(false)
+
   const taskCount = categories.reduce(
     (total, category) => total + (category.tasks?.length ?? 0),
     0
   )
+
+  const completedTaskCount = categories.reduce(
+    (total, category) => total + (category.tasks ?? []).filter((task => task.status === 'DONE')).length,
+    0
+  )
+
   const totalHours = categories.reduce(
     (total, category) =>
       total + (category.tasks ?? []).reduce((sum, task) => sum + (task.estimatedHours ?? 0), 0),
@@ -646,22 +654,27 @@ const handleEditCategory = async (e) => {
     }
   }
 
-  // ________________________________________________________
 
-  const handleToggleTask = async (task) => {
+// ________________________________________________________
+
+  const handleStatusTask = async(task, newStatus) => {
     try {
       const response = await fetch(
-        `${API_BASE}/tasks/${task.id}/completed`,
+        `${API_BASE}/tasks/${task.id}/status`,
         {
           method: 'PATCH',
           headers: {
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${getToken()}`,
           },
+          body: JSON.stringify({
+            status: newStatus,
+          }),
         }
       )
 
       if (!response.ok) {
-        throw new Error('Could not update the task')
+        throw new Error('Could not update the task status')
       }
 
       const result = await response.json()
@@ -676,9 +689,8 @@ const handleEditCategory = async (e) => {
           ),
         }))
       )
-
-    } catch (error) {
-      console.error('Could not update the task:', error)
+    }catch (error) {
+      console.error('Could not update the task status:', error)
     }
   }
 
@@ -1093,6 +1105,11 @@ const handleEditCategory = async (e) => {
                 </div>
 
                 <div className={styles.stat}>
+                  <span className={styles.statValue}> {completedTaskCount} </span>
+                  <span className={styles.statLabel}> completed tasks </span>
+                </div>
+
+                <div className={styles.stat}>
                   <span className={styles.statValue}> {Math.round(totalHours * 10) / 10} </span>
                   <span className={styles.statLabel}> hours of work </span>
                 </div>
@@ -1111,12 +1128,48 @@ const handleEditCategory = async (e) => {
             
           </>
         )}
+
+      {showBudgetOverview && (
+        <section className={styles.budgetOverview}>
+          <div className={styles.budgetHeader}>
+            <div>
+              <p className={styles.eyebrow}>Budget overview</p>
+              <h2 className={styles.budgetTitle} >Wedding budget</h2>
+            </div>
+
+            <button className={styles.budgetClose} onClick={() => setShowBudgetOverview(false)}> × </button>
+          </div>
+
+          <div className={styles.budgetSummary}>
+            <span className={styles.budgetGraphPlaceholder}>INSERT GRAPH</span>
+          </div>
+
+          <div className={styles.budgetCategories}>
+            <div className={styles.budgetRow}>
+              <span>Venue</span>
+              <span>15,000 / 20,000 kr.</span>
+            </div>
+
+            <div className={styles.budgetRow}>
+              <span>Food & drinks</span>
+              <span>12,000 / 10,000 kr.</span>
+            </div>
+
+            <div className={styles.budgetRow}>
+              <span>Flowers & decor</span>
+              <span>5,500 / 8,000 kr.</span>
+            </div>
+          </div>
+        </section>
+      )} 
+
+
       <DndContext onDragEnd={handleDragEnd}>
         <div className={styles.categoryBoard}>
           {categories.map((category) => (
             <DraggableCategory
               key={category.id}
-              category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onEditTask={handleOpenEditTask} onDeleteTask={handleOpenDeleteTask} onToggleTask={handleToggleTask}
+              category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onEditTask={handleOpenEditTask} onDeleteTask={handleOpenDeleteTask} onChangeStatus={handleStatusTask}
             />
           ))}
 

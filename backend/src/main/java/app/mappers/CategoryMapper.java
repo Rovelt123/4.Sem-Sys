@@ -4,6 +4,7 @@ import app.dtos.CategoryDTO;
 import app.entities.Category;
 import app.entities.Task;
 import app.mappers.generic.IMapper;
+import app.enums.Status;
 
 import java.util.Set;
 import java.util.Comparator;
@@ -50,7 +51,7 @@ public class CategoryMapper implements IMapper<Category, CategoryDTO> {
             .position(entity.getPosition())
             .title(entity.getTitle())
             .taskCount(entity.getTasks().size())
-            .completedTaskCount(entity.getTasks().stream().filter(Task::isCompleted).count())
+            .completedTaskCount(entity.getTasks().stream().filter(task -> task.getStatus() == Status.DONE).count())
             .totalEstimatedHours(entity.getTasks().stream().mapToDouble(Task::getEstimatedHours).sum())
             .tasks(
                 entity.getTasks().stream()
