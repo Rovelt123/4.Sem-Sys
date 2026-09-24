@@ -5,6 +5,7 @@ import app.entities.Category;
 import app.entities.Task;
 import app.mappers.generic.IMapper;
 import app.enums.Status;
+import app.services.BudgetService;
 
 import java.util.Set;
 import java.util.Comparator;
@@ -59,6 +60,7 @@ public class CategoryMapper implements IMapper<Category, CategoryDTO> {
                 .map(taskMapper::toDTO)
                 .collect(Collectors.toCollection(LinkedHashSet::new))
             )
+            .totalTasksPrice(BudgetService.totalSpentCategory(entity))
             .build();
     }
 }

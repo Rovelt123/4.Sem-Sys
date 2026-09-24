@@ -20,6 +20,7 @@ public class CategoryDTO {
     private int taskCount;
     private long completedTaskCount;
     private double totalEstimatedHours;
+    private double totalTasksPrice;
 
     @Builder.Default
     private Set<TaskDTO> tasks = new HashSet<>();
