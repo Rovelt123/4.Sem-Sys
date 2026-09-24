@@ -3,7 +3,7 @@ import DraggableTask from './DraggableTask'
 import { useDroppable } from '@dnd-kit/core'
 import {SortableContext, verticalListSortingStrategy,} from '@dnd-kit/sortable'
 
-function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onDeleteTask, onChangeStatus }) {
+function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onDeleteTask, onChangeStatus, totalPrice }) {
 
     const isUncategorized = category.title === 'Uncategorized'
 
@@ -12,9 +12,9 @@ function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onD
 
     const totalHours = tasks.reduce((sum, task) => sum + (task.estimatedHours ?? 0), 0)
 
-    const totalTasksPrice = tasks.reduce((sum, task) => sum + (task.price ?? 0),
-    0
-)
+    const totalTasksPrice = tasks.reduce((sum, task) => sum + (task.price ?? 0), 0)
+
+    const categoryPercentageBudget = totalPrice > 0 ? (totalTasksPrice/totalPrice) * 100 : 0
 
     const {
         setNodeRef,
@@ -59,7 +59,7 @@ function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onD
             {tasks.length > 0 && (
                 <p className={styles.columnTotals}>
                     {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}, {Math.round(totalHours * 10) / 10} h,
-                total expence {totalTasksPrice} kr.
+                total expence {totalTasksPrice} kr., {Math.round(categoryPercentageBudget)}%
                 </p>
             )}
 

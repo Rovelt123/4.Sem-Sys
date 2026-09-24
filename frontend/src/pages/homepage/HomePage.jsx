@@ -1169,7 +1169,7 @@ const handleEditCategory = async (e) => {
           {categories.map((category) => (
             <DraggableCategory
               key={category.id}
-              category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onEditTask={handleOpenEditTask} onDeleteTask={handleOpenDeleteTask} onChangeStatus={handleStatusTask}
+              category={category} onEdit={handleOpenEditCategory} onDelete={handleOpenDeleteCategory} onAddTask={handleOpenCreateTask} onEditTask={handleOpenEditTask} onDeleteTask={handleOpenDeleteTask} onChangeStatus={handleStatusTask} totalPrice={totalPrice}
             />
           ))}
 
