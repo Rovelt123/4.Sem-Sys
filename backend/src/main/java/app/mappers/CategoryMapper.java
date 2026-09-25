@@ -23,6 +23,7 @@ public class CategoryMapper implements IMapper<Category, CategoryDTO> {
             .id(dto.getId())
             .position(dto.getPosition())
             .title(dto.getTitle())
+            .categoryBudget(dto.getCategoryBudget())
             .build();
 
         if (dto.getTasks() != null) {
@@ -61,6 +62,7 @@ public class CategoryMapper implements IMapper<Category, CategoryDTO> {
                 .collect(Collectors.toCollection(LinkedHashSet::new))
             )
             .totalTasksPrice(BudgetService.totalSpentCategory(entity))
+            .categoryBudget(entity.getCategoryBudget())
             .build();
     }
 }
