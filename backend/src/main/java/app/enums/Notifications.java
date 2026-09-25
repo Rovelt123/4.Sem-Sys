@@ -71,6 +71,7 @@ public enum Notifications {
     CATEGORY_UNCATEGORIZED_DELETE("The Uncategorized category cannot be deleted."),
     CATEGORY_NAME_RESERVED("Uncategorized is a reserved category name."),
     CATEGORY_UNCATEGORIZED_RENAME("The Uncategorized category cannot be renamed or replaced."),
+    CATEGORY_BUDGET_INVALID("Category budget is invalid"),
 
     // TASK
     TASK_CREATED("Task created."),
