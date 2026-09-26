@@ -3,7 +3,7 @@ import DraggableTask from './DraggableTask'
 import { useDroppable } from '@dnd-kit/core'
 import {SortableContext, verticalListSortingStrategy,} from '@dnd-kit/sortable'
 
-function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onDeleteTask, onToggleTask }) {
+function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onDeleteTask, onChangeStatus }) {
 
     const isUncategorized = category.title === 'Uncategorized'
 
@@ -70,7 +70,7 @@ function CategoryColumn({ category, onEdit, onDelete, onAddTask, onEditTask, onD
                         task={task}
                         onEditTask={onEditTask}
                         onDeleteTask={onDeleteTask}
-                        onToggleTask={onToggleTask}
+                        onChangeStatus={onChangeStatus}
                     />
                     ))}
                 </ul>
