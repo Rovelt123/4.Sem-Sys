@@ -23,6 +23,26 @@ public class BudgetServiceTest {
 
     // ________________________________________________________
 
+    private Category categoryWith(float... prices) {
+        Category category = Category.builder()
+                .title("Venue")
+                .position(0)
+                .build();
+
+        for (int i = 0; i < prices.length; i++) {
+            category.addTask(
+                    Task.builder()
+                            .title("Task " + (i + 1))
+                            .price(prices[i])
+                            .build()
+            );
+        }
+
+        return category;
+    }
+
+    // ________________________________________________________
+
     @Test
     void totalSpentSumsAllTaskPrices() {
         assertEquals(3500.5, BudgetService.totalSpent(weddingWith(10000, 1000, 2500.5f)), 0.001);
@@ -75,5 +95,26 @@ public class BudgetServiceTest {
     @Test
     void budgetOverrunIsTheAmountAboveTheBudget() {
         assertEquals(500, BudgetService.budgetOverrun(weddingWith(1000, 1500)), 0.001);
+    }
+
+
+// ______________________________Category budget test__________________________
+
+    @Test
+    void totalSpentCategoryAllTaskPrices() {
+        assertEquals(300, BudgetService.totalSpentCategory(categoryWith(100, 200)), 0.001);
+
+    }
+
+
+    // ________________________________________________________
+
+    @Test
+    void totalSpentCategoryIsZeroWhenNoTasksHavePrice() {
+        assertEquals(
+                0,
+                BudgetService.totalSpentCategory(categoryWith()),
+                0.001
+        );
     }
 }
